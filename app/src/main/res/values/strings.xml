@@ -6,9 +6,12 @@
     <string name="humidity">Humidity</string>
     <string name="cloud">Cloud</string>
     <string name="wind">Wind</string>
-    <string name="next5days">Next 5 Days</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <string name="date">Date</string>
+    <string name="date_status">Date Status</string>
+    <string name="max_temp">Max Temp</string>
+    <string name="min_temp">Min Temp</string>
     <string name="add_location">Add Location</string>
     <string name="setting">Setting</string>
 </resources>

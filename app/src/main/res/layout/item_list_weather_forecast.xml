@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tvDate"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="10dp"
+        android:gravity="center"
+        android:text="@string/date"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/tvDateStatus"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/tvDate"
+        android:layout_marginLeft="10dp"
+        android:gravity="center"
+        android:text="@string/date_status"
+        android:textSize="20sp" />
+
+    <ImageView
+        android:id="@+id/imgIconDate"
+        android:layout_width="65dp"
+        android:layout_height="100dp"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/tvDate"
+        android:src="@drawable/img_date" />
+
+    <TextView
+        android:id="@+id/tvMaxTemp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="30dp"
+        android:layout_toEndOf="@id/imgIconDate"
+        android:text="@string/max_temp"
+        android:textSize="20sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/tvDateStatus"
+        android:layout_toEndOf="@+id/imgIconDate"
+        android:layout_marginLeft="30dp"
+        android:text="@string/min_temp"
+        android:textSize="20sp" />
+
+</RelativeLayout>
