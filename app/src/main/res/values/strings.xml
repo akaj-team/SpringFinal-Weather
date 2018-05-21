@@ -7,4 +7,6 @@
     <string name="cloud">Cloud</string>
     <string name="wind">Wind</string>
     <string name="next5days">Next 5 Days</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
 </resources>
