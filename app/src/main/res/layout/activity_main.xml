@@ -103,17 +103,55 @@
         </RelativeLayout>
     </ScrollView>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/lnDrawer"
-        android:layout_width="250dp"
+        android:layout_width="230dp"
         android:layout_height="match_parent"
-        android:layout_gravity="start">
+        android:layout_gravity="start"
+        android:background="@color/colorWhite"
+        android:padding="10dp">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerViewLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/vLine"
+            android:layout_alignParentTop="true" />
+
+        <View
+            android:id="@+id/vLine"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_above="@id/tvAddLocation"
+            android:background="@color/colorGray" />
 
         <TextView
+            android:id="@+id/tvAddLocation"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/tvSetting"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_tv_when_press"
+            android:clickable="true"
+            android:drawableLeft="@drawable/ic_add_black_36dp"
+            android:focusable="true"
             android:gravity="center"
-            android:text="@string/app_name" />
-    </LinearLayout>
+            android:text="@string/add_location"
+            android:textSize="18sp" />
 
+        <TextView
+            android:id="@+id/tvSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_tv_when_press"
+            android:clickable="true"
+            android:drawableLeft="@drawable/ic_settings_black_36dp"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="@string/setting"
+            android:textSize="18sp" />
+    </RelativeLayout>
 </android.support.v4.widget.DrawerLayout>
