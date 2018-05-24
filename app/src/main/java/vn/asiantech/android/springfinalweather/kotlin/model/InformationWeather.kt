@@ -1,5 +1,7 @@
 package vn.asiantech.android.springfinalweather.kotlin.model
 
+import com.google.gson.annotations.SerializedName
+
 class InformationtWeather {
 
 
@@ -18,7 +20,6 @@ class InformationtWeather {
      * cod : 200
      */
 
-    var coord: CoordBean? = null
     var base: String? = null
     var main: MainBean? = null
     var visibility: Int = 0
@@ -28,18 +29,7 @@ class InformationtWeather {
     var sys: SysBean? = null
     var id: Int = 0
     var name: String? = null
-    var cod: Int = 0
     var weather: List<WeatherBean>? = null
-
-    class CoordBean {
-        /**
-         * lon : 105.85
-         * lat : 21.03
-         */
-
-        var lon: Double = 0.toDouble()
-        var lat: Double = 0.toDouble()
-    }
 
     class MainBean {
         /**
@@ -51,10 +41,11 @@ class InformationtWeather {
          */
 
         var temp: Double = 0.toDouble()
-        var pressure: Int = 0
         var humidity: Int = 0
-        var temp_min: Double = 0.toDouble()
-        var temp_max: Double = 0.toDouble()
+        @SerializedName("temp_min")
+        var tempMin: Double = 0.toDouble()
+        @SerializedName("temp_max")
+        var tempMax: Double = 0.toDouble()
     }
 
     class WindBean {
@@ -64,7 +55,6 @@ class InformationtWeather {
          */
 
         var speed: Double = 0.toDouble()
-        var deg: Int = 0
     }
 
     class CloudsBean {
@@ -85,12 +75,7 @@ class InformationtWeather {
          * sunset : 1526902188
          */
 
-        var type: Int = 0
-        var id: Int = 0
-        var message: Double = 0.toDouble()
         var country: String? = null
-        var sunrise: Int = 0
-        var sunset: Int = 0
     }
 
     class WeatherBean {
@@ -102,7 +87,6 @@ class InformationtWeather {
          */
 
         var id: Int = 0
-        var main: String? = null
         var description: String? = null
         var icon: String? = null
     }

@@ -29,6 +29,8 @@ class FragmentShowWeatherForecast : Fragment() {
     private lateinit var mEdtSearch: EditText
     private lateinit var mBtnSearch: Button
     private lateinit var mTvTemp: TextView
+    private lateinit var mTvMaxTemp: TextView
+    private lateinit var mTvMinTemp: TextView
     private lateinit var mImgIcon: ImageView
     private lateinit var mTvStatus: TextView
     private lateinit var mTvHumidity: TextView
@@ -49,6 +51,8 @@ class FragmentShowWeatherForecast : Fragment() {
         mEdtSearch = view.findViewById(R.id.edtSearch)
         mBtnSearch = view.findViewById(R.id.btnSearch)
         mTvTemp = view.findViewById(R.id.tvTemp)
+        mTvMaxTemp = view.findViewById(R.id.tvMaxTemp)
+        mTvMinTemp = view.findViewById(R.id.tvMinTemp)
         mImgIcon = view.findViewById(R.id.imgIcon)
         mTvStatus = view.findViewById(R.id.tvStatus)
         mTvHumidity = view.findViewById(R.id.tvHumidity)
@@ -90,8 +94,12 @@ class FragmentShowWeatherForecast : Fragment() {
 
         if (mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0) == 0) {
             mTvTemp.text = getCelsiusDegree(mainBean?.temp?.toFloat()).toString() + "°C"
+            mTvMaxTemp.text = getCelsiusDegree(mainBean?.tempMax?.toFloat()).toString() + "°C"
+            mTvMinTemp.text = getCelsiusDegree(mainBean?.tempMin?.toFloat()).toString() + "°C"
         } else {
             mTvTemp.text = getFahrenheit(mainBean?.temp?.toFloat()).toString() + "°F"
+            mTvMaxTemp.text = getFahrenheit(mainBean?.tempMax?.toFloat()).toString() + "°F"
+            mTvMinTemp.text = getFahrenheit(mainBean?.tempMin?.toFloat()).toString() + "°F"
         }
 
         @SuppressLint("SimpleDateFormat")
@@ -104,7 +112,7 @@ class FragmentShowWeatherForecast : Fragment() {
         mTvCountryName.text = informationtWeather.name + ", " + sysBean?.country
         val icon = weatherBean?.get(0)?.icon
         mImgIcon.setImageResource(getIcon(icon.toString()))
-        mTvStatus.text = weatherBean?.get(0)?.main
+        mTvStatus.text = weatherBean?.get(0)?.description
         mTvHumidity.text = mainBean?.humidity.toString() + "%"
         mTvCloud.text = cloudsBean?.all.toString() + "%"
     }
