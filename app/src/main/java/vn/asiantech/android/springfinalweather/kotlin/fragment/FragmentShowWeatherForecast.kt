@@ -79,9 +79,10 @@ class FragmentShowWeatherForecast : Fragment() {
         val cloudsBean = informationtWeather.clouds
         val windBean = informationtWeather.wind
 
-        mSharedPreferences = activity?.getPreferences(Context.MODE_PRIVATE)
-        Log.d("zxv", mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0).toString())
-        if (mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0) == 0) {
+        mSharedPreferences = activity?.getSharedPreferences(
+                getString(R.string.shared_preference_name),
+                Context.MODE_PRIVATE)
+        if (mSharedPreferences?.getInt(Constants.UNIT_OF_WIND_SPEED, 0) == 0) {
             mTvWind.text = getKilomet(windBean?.speed?.toFloat()).toString() + " km/h"
         } else {
             mTvWind.text = windBean?.speed.toString() + " m/s"
@@ -115,15 +116,23 @@ class FragmentShowWeatherForecast : Fragment() {
     }
 
     private fun getCelsiusDegree(cel: Float?): Float? {
-        val convert = BigDecimal("273.15")
-        val celsius = convert.setScale(2, BigDecimal.ROUND_HALF_EVEN).toFloat()
-        return (cel?.minus(celsius))
+        if (cel != null) {
+            val convert = 273.15
+            val celsius = cel.minus(convert)
+            val result = Math.round(celsius.toFloat().times(10)) / 10.0
+            return result.toFloat()
+        }
+        return cel
     }
 
     private fun getFahrenheit(fah: Float?): Float? {
-        val convert = BigDecimal("2.05")
-        val fahrenheit = convert.setScale(2, BigDecimal.ROUND_HALF_EVEN).toFloat()
-        return (fah?.div(fahrenheit))
+        if (fah != null) {
+            val convert = 2.0
+            val fahrenheit = fah.div(convert)
+            val result = Math.round(fahrenheit.toFloat().times(10)) / 10.0
+            return result.toFloat()
+        }
+        return fah
     }
 
     private fun getIcon(icon: String): Int {
