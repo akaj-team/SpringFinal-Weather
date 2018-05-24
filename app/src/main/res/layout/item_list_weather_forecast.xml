@@ -31,7 +31,7 @@
         android:src="@drawable/img_date" />
 
     <TextView
-        android:id="@+id/tvMaxTemp"
+        android:id="@+id/tvMaxTempList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
@@ -41,10 +41,10 @@
         android:textSize="20sp" />
 
     <TextView
-        android:id="@+id/tvMinTemp"
+        android:id="@+id/tvMinTempList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/tvMaxTemp"
+        android:layout_alignStart="@+id/tvMaxTempList"
         android:layout_below="@+id/tvDate"
         android:layout_marginTop="5dp"
         android:text="@string/min_temp"
