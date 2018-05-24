@@ -34,18 +34,19 @@
         android:id="@+id/tvMaxTemp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         android:layout_marginLeft="30dp"
+        android:layout_marginTop="5dp"
         android:layout_toEndOf="@id/imgIconDate"
         android:text="@string/max_temp"
         android:textSize="20sp" />
 
     <TextView
+        android:id="@+id/tvMinTemp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/tvDateStatus"
-        android:layout_toEndOf="@+id/imgIconDate"
-        android:layout_marginLeft="30dp"
+        android:layout_alignStart="@+id/tvMaxTemp"
+        android:layout_below="@+id/tvDate"
+        android:layout_marginTop="5dp"
         android:text="@string/min_temp"
         android:textSize="20sp" />
 

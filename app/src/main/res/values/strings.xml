@@ -14,8 +14,12 @@
     <string name="min_temp">Min Temp</string>
     <string name="add_location">Add Location</string>
     <string name="setting">Setting</string>
+    <string name="search">Search</string>
+    <string name="search_city">Search City</string>
+    <string name="country_name">Country Name</string>
     <string name="allow_current_location">Allow Current Location</string>
     <string name="unit">Unit</string>
     <string name="temperature">Temperature</string>
     <string name="wind_speed">Wind Speed</string>
+    <string name="notification">Get location Failed</string>
 </resources>

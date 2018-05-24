@@ -4,6 +4,7 @@
     package="vn.asiantech.android.springfinalweather">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -13,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning,RtlEnabled">
         <activity android:name=".MainActivity" />
         <activity
             android:name=".kotlin.activity.MainActivity"
