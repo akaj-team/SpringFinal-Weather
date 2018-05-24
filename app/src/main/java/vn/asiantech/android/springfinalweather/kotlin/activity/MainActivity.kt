@@ -1,5 +1,6 @@
 package vn.asiantech.android.springfinalweather.kotlin.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var mTvTitle: TextView
     private lateinit var mViewPager: ViewPager
     private lateinit var mViewPagerAdapter: ViewPagerAdapter
+    private lateinit var mTvSetting: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +35,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         mDrawerToggle = ActionBarDrawerToggle(this, mDrawerLayout, R.string.open, R.string.close)
         mImgMenuIcon = findViewById(R.id.imgMenuIcon)
         mTvTitle = findViewById(R.id.tvTitle)
+        mTvSetting = findViewById(R.id.tvSetting)
     }
 
     private fun initViewPager() {
@@ -44,9 +47,18 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private fun initListener() {
         mDrawerLayout.addDrawerListener(mDrawerToggle)
         mImgMenuIcon.setOnClickListener(this)
+        mTvSetting.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
-        mDrawerLayout.openDrawer(Gravity.LEFT)
+        when (v?.id) {
+            R.id.imgMenuIcon -> mDrawerLayout.openDrawer(Gravity.LEFT)
+            R.id.tvSetting -> goTo(SettingActivity::class.java)
+        }
+    }
+
+    private fun goTo(markClass: Class<*>) {
+        intent = Intent(this, markClass)
+        startActivity(intent)
     }
 }
