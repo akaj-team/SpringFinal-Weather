@@ -8,10 +8,10 @@
     android:fitsSystemWindows="true"
     tools:context=".kotlin.activity.MainActivity">
 
-    <RelativeLayout
-        android:id="@+id/rlContent"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolBar"
@@ -34,7 +34,14 @@
                 android:gravity="center"
                 android:text="@string/app_name" />
         </android.support.v7.widget.Toolbar>
-    </RelativeLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </android.support.v4.view.ViewPager>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/lnDrawer"
