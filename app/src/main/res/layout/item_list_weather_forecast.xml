@@ -49,5 +49,4 @@
         android:layout_marginTop="5dp"
         android:text="@string/min_temp"
         android:textSize="20sp" />
-
 </RelativeLayout>

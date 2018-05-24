@@ -15,7 +15,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning,RtlEnabled">
-        <activity android:name=".MainActivity" />
         <activity
             android:name=".kotlin.activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -26,6 +25,9 @@
         </activity>
         <activity
             android:name=".kotlin.activity.SettingActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".kotlin.activity.SearchActivity"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 </manifest>

@@ -14,6 +14,7 @@
     <string name="min_temp">Min Temp</string>
     <string name="add_location">Add Location</string>
     <string name="setting">Setting</string>
+    <string name="city_name">Enter city\'s name</string>
     <string name="search">Search</string>
     <string name="search_city">Search City</string>
     <string name="country_name">Country Name</string>
@@ -22,4 +23,6 @@
     <string name="temperature">Temperature</string>
     <string name="wind_speed">Wind Speed</string>
     <string name="notification">Get location Failed</string>
+    <string name="connect_fail">Fail to connect to the Internet</string>
+    <string name="response_fail">Fail to get response from Api</string>
 </resources>
