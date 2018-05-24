@@ -21,5 +21,6 @@
     <string name="unit">Unit</string>
     <string name="temperature">Temperature</string>
     <string name="wind_speed">Wind Speed</string>
+    <string name="shared_preference_name">mysharedpreferece</string>
     <string name="notification">Get location Failed</string>
 </resources>
