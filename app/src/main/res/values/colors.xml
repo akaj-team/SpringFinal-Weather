@@ -6,5 +6,7 @@
     <color name="colorPurple">#8A409B</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorBlack">#000000</color>
+    <color name="colorViolet">#e7d0e6</color>
+    <color name="colorPurplePastel">#CC70E2</color>
     <color name="colorGray">#c6c6c6</color>
 </resources>
