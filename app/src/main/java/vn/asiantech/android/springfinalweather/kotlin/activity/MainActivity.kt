@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var mViewPager: ViewPager
     private lateinit var mViewPagerAdapter: ViewPagerAdapter
     private lateinit var mTvSetting: TextView
+    private lateinit var mTvAddLocation: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +37,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         mImgMenuIcon = findViewById(R.id.imgMenuIcon)
         mTvTitle = findViewById(R.id.tvTitle)
         mTvSetting = findViewById(R.id.tvSetting)
+        mTvAddLocation = findViewById(R.id.tvAddLocation)
     }
 
     private fun initViewPager() {
@@ -48,12 +50,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         mDrawerLayout.addDrawerListener(mDrawerToggle)
         mImgMenuIcon.setOnClickListener(this)
         mTvSetting.setOnClickListener(this)
+        mTvAddLocation.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.imgMenuIcon -> mDrawerLayout.openDrawer(Gravity.LEFT)
             R.id.tvSetting -> goTo(SettingActivity::class.java)
+            R.id.tvAddLocation -> goTo(SearchActivity::class.java)
         }
     }
 
