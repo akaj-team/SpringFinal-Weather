@@ -87,7 +87,7 @@ class FragmentShowWeatherForecast : Fragment() {
                 getString(R.string.shared_preference_name),
                 Context.MODE_PRIVATE)
         if (mSharedPreferences?.getInt(Constants.UNIT_OF_WIND_SPEED, 0) == 0) {
-            mTvWind.text = getKilomet(windBean?.speed?.toFloat()).toString() + " km/h"
+            mTvWind.text = getKilometer(windBean?.speed?.toFloat()).toString() + " km/h"
         } else {
             mTvWind.text = windBean?.speed.toString() + " m/s"
         }
@@ -97,9 +97,9 @@ class FragmentShowWeatherForecast : Fragment() {
             mTvMaxTemp.text = getCelsiusDegree(mainBean?.tempMax?.toFloat()).toString() + "°C"
             mTvMinTemp.text = getCelsiusDegree(mainBean?.tempMin?.toFloat()).toString() + "°C"
         } else {
-            mTvTemp.text = getFahrenheit(mainBean?.temp?.toFloat()).toString() + "°F"
-            mTvMaxTemp.text = getFahrenheit(mainBean?.tempMax?.toFloat()).toString() + "°F"
-            mTvMinTemp.text = getFahrenheit(mainBean?.tempMin?.toFloat()).toString() + "°F"
+            mTvTemp.text = getFahrenheitDegree(mainBean?.temp?.toFloat()).toString() + "°F"
+            mTvMaxTemp.text = getFahrenheitDegree(mainBean?.tempMax?.toFloat()).toString() + "°F"
+            mTvMinTemp.text = getFahrenheitDegree(mainBean?.tempMin?.toFloat()).toString() + "°F"
         }
 
         @SuppressLint("SimpleDateFormat")
@@ -117,7 +117,7 @@ class FragmentShowWeatherForecast : Fragment() {
         mTvCloud.text = cloudsBean?.all.toString() + "%"
     }
 
-    private fun getKilomet(speed: Float?): Float? {
+    private fun getKilometer(speed: Float?): Float? {
         val convert = BigDecimal("3.6")
         val kilometer = convert.setScale(2, BigDecimal.ROUND_HALF_EVEN).toFloat()
         return (speed?.times(kilometer))
@@ -133,7 +133,7 @@ class FragmentShowWeatherForecast : Fragment() {
         return cel
     }
 
-    private fun getFahrenheit(fah: Float?): Float? {
+    private fun getFahrenheitDegree(fah: Float?): Float? {
         if (fah != null) {
             val convert = 2.0
             val fahrenheit = fah.div(convert)
