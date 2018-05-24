@@ -7,10 +7,7 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -63,7 +60,7 @@ class FragmentShowWeatherForecast : Fragment() {
             }
 
             override fun onFailure(call: Call<InformationtWeather>, t: Throwable) {
-
+                Toast.makeText(context, R.string.notification, Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -84,7 +81,7 @@ class FragmentShowWeatherForecast : Fragment() {
         val time = simpleDateFormat.format(date)
         mTvCurrentDay.text = time
         mTvCountryName.text = informationtWeather.name + ", " + sysBean?.country
-        mTvTemp.text = mainBean?.temp.toString() + " °K"
+        mTvTemp.text = mainBean?.temp.toString() + "°K"
         val icon = weatherBean?.get(0)?.icon
         mImgIcon.setImageResource(getIcon(icon.toString()))
         mTvStatus.text = weatherBean?.get(0)?.main
@@ -95,63 +92,25 @@ class FragmentShowWeatherForecast : Fragment() {
 
     private fun getIcon(icon: String): Int {
         when (icon) {
-            Constants.ICON_01D -> {
-                return R.drawable.img_01d
-            }
-            Constants.ICON_01N -> {
-                return R.drawable.img_01n
-            }
-            Constants.ICON_02D -> {
-                return R.drawable.img_02d
-            }
-            Constants.ICON_02N -> {
-                return R.drawable.img_02n
-            }
-            Constants.ICON_03D -> {
-                return R.drawable.img_03d
-            }
-            Constants.ICON_03N -> {
-                return R.drawable.img_03n
-            }
-            Constants.ICON_04D -> {
-                return R.drawable.img_04d
-            }
-            Constants.ICON_04N -> {
-                return R.drawable.img_04n
-            }
-            Constants.ICON_09D -> {
-                return R.drawable.img_09d
-            }
-            Constants.ICON_09N -> {
-                return R.drawable.img_09n
-            }
-            Constants.ICON_10D -> {
-                return R.drawable.img_10d
-            }
-            Constants.ICON_10N -> {
-                return R.drawable.img_10n
-            }
-            Constants.ICON_11D -> {
-                return R.drawable.img_11d
-            }
-            Constants.ICON_11N -> {
-                return R.drawable.img_11n
-            }
-            Constants.ICON_13D -> {
-                return R.drawable.img_13d
-            }
-            Constants.ICON_13N -> {
-                return R.drawable.img_13n
-            }
-            Constants.ICON_50D -> {
-                return R.drawable.img_50d
-            }
-            Constants.ICON_50N -> {
-                return R.drawable.img_50n
-            }
-            else -> {
-                return R.drawable.img_sun
-            }
+            Constants.ICON_01D -> return R.drawable.img_01d
+            Constants.ICON_01N -> return R.drawable.img_01n
+            Constants.ICON_02D -> return R.drawable.img_02d
+            Constants.ICON_02N -> return R.drawable.img_02n
+            Constants.ICON_03D -> return R.drawable.img_03d
+            Constants.ICON_03N -> return R.drawable.img_03n
+            Constants.ICON_04D -> return R.drawable.img_04d
+            Constants.ICON_04N -> return R.drawable.img_04n
+            Constants.ICON_09D -> return R.drawable.img_09d
+            Constants.ICON_09N -> return R.drawable.img_09n
+            Constants.ICON_10D -> return R.drawable.img_10d
+            Constants.ICON_10N -> return R.drawable.img_10n
+            Constants.ICON_11D -> return R.drawable.img_11d
+            Constants.ICON_11N -> return R.drawable.img_11n
+            Constants.ICON_13D -> return R.drawable.img_13d
+            Constants.ICON_13N -> return R.drawable.img_13n
+            Constants.ICON_50D -> return R.drawable.img_50d
+            Constants.ICON_50N -> return R.drawable.img_50n
+            else -> return R.drawable.img_sun
         }
     }
 

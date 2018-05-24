@@ -8,13 +8,9 @@ import vn.asiantech.android.springfinalweather.kotlin.fragment.FragmentShowWeath
 class ViewPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
     override fun getItem(position: Int): Fragment? {
-        when (position) {
-            0 -> {
-                return FragmentShowWeatherForecast()
-            }
-            else -> {
-                return null
-            }
+        return when (position) {
+            0 -> FragmentShowWeatherForecast()
+            else -> null
         }
     }
 
