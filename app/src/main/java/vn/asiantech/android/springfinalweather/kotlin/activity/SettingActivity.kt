@@ -55,7 +55,10 @@ class SettingActivity : AppCompatActivity(),
     }
 
     private fun initData() {
-        mSharedPreferences = getPreferences(Context.MODE_PRIVATE)
+        mSharedPreferences = getSharedPreferences(
+                getString(R.string.shared_preference_name),
+                Context.MODE_PRIVATE
+        )
         mEditor = mSharedPreferences.edit()
         mSwitchAllowCurrentLocation.isChecked = mSharedPreferences.getBoolean(Constants.LOCATION_PERMISSION, false)
         mCheckedItemTemp = mSharedPreferences.getInt(Constants.UNIT_OF_TEMP, 0)
