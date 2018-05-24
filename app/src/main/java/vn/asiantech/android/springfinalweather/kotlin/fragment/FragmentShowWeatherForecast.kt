@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.support.v4.app.Fragment
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,7 +39,6 @@ class FragmentShowWeatherForecast : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_show_weather_forecast, container, false)
         initViews(view)
-        Log.d("zxc", "onCreat: ")
         setListener()
         return view
     }
