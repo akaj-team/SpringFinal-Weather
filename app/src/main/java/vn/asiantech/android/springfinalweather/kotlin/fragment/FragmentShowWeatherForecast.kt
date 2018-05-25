@@ -19,12 +19,10 @@ import retrofit2.Response
 import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.adapter.RecyclerViewAdapter
-import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiServices
 import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiServicesRecyclerView
-import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
 import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeather
 import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeatherRecyclerView
-import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
+import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionChangeListener
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -61,36 +59,40 @@ class FragmentShowWeatherForecast : Fragment() {
         mTvHumidity = view.findViewById(R.id.tvHumidity)
         mTvCloud = view.findViewById(R.id.tvCloud)
         mTvWind = view.findViewById(R.id.tvWind)
-
         mRecyclerView = view.findViewById(R.id.recyclerView)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initData() {
         val bundle = arguments
         if (bundle != null) {
-            loadInformationWeather(bundle.getString(Constants.CITY_NAME))
+            mSharedPreferences = activity?.getSharedPreferences(
+                    getString(R.string.shared_preference_name),
+                    Context.MODE_PRIVATE)
+            if (mSharedPreferences?.getInt(Constants.UNIT_OF_WIND_SPEED, 0) == 0) {
+                mTvWind.text = getKilometer(bundle.getFloat(Constants.WIND)).toString() + " km/h"
+            } else {
+                mTvWind.text = bundle.getFloat(Constants.WIND).toString() + " m/s"
+            }
+
+            if (mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0) == 0) {
+                mTvTemp.text = bundle.getFloat(Constants.TEMP).toString() + "°C"
+
+            } else {
+                mTvTemp.text = getFahrenheitDegree(bundle.getFloat(Constants.TEMP)).toString() + "°F"
+            }
+            mTvCurrentDay.text = bundle.getString(Constants.DATE)
+            mTvSunrise.text = bundle.getString(Constants.SUNRISE)
+            mTvSunset.text = bundle.getString(Constants.SUNSET)
+            mTvCountryName.text = bundle.getString(Constants.CITY_NAME) + ", " + bundle.getString(Constants.COUNTRY_NAME)
+            mImgIcon.setImageResource(getIcon(bundle.getString(Constants.ICON)))
+            mTvStatus.text = bundle.getString(Constants.DESCRIPTION)
+            mTvHumidity.text = bundle.getInt(Constants.HUMIDITY).toString() + "%"
+            mTvCloud.text = bundle.getInt(Constants.CLOUD).toString() + "%"
         }
     }
 
-    private fun loadInformationWeather(cityName: String) {
-        val apiServices = ApiServices()
-        apiServices.getIEventWeather().getInformationWeather(cityName, Constants.KEY).enqueue(object : Callback<InformationWeather> {
-            override fun onResponse(call: Call<InformationWeather>, response: Response<InformationWeather>) {
-                if (response.body() != null) {
-                    response.body()?.let {
-                        saveNewCityCollection(it)
-                        showInformationWeather(it)
-                    }
-                } else {
-                    Toast.makeText(context, R.string.city_not_found, Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
-                Toast.makeText(context, R.string.notification, Toast.LENGTH_SHORT).show()
-            }
-        })
-
+    private fun loadListNextDay(cityName: String) {
         val apiServicesRecyclerView = ApiServicesRecyclerView()
         apiServicesRecyclerView.getIEventWeatherRecyclerView().getInformationWeatherRecyclerView(cityName, Constants.DAYS, Constants.KEY).enqueue(object : Callback<InformationWeatherRecyclerView> {
             override fun onResponse(call: Call<InformationWeatherRecyclerView>?, response: Response<InformationWeatherRecyclerView>?) {
@@ -121,6 +123,23 @@ class FragmentShowWeatherForecast : Fragment() {
         cityCollection.cloud = informationWeather.data[0].clouds
         cityCollection.description = informationWeather.data[0].weather.description
         cityCollection.icon = informationWeather.data[0].weather.icon
+        weatherRepository?.insert(cityCollection)
+    }
+
+    private fun saveNewCityCollection(informationWeather: InformationWeather) {
+        val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
+        val cityCollection = CityCollection()
+        cityCollection.id = informationWeather.id
+        cityCollection.name = informationWeather.name
+        cityCollection.countryName = informationWeather.sys.country
+        cityCollection.temp = informationWeather.main.temp
+        cityCollection.tempMax = informationWeather.main.tempMax
+        cityCollection.tempMin = informationWeather.main.tempMin
+        cityCollection.humidity = informationWeather.main.humidity
+        cityCollection.wind = informationWeather.wind.speed
+        cityCollection.cloud = informationWeather.clouds.all
+        cityCollection.description = informationWeather.weather[0].description
+        cityCollection.icon = informationWeather.weather[0].icon
         weatherRepository?.insert(cityCollection)
     }
 

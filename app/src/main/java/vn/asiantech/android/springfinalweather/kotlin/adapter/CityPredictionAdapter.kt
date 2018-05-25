@@ -31,7 +31,7 @@ class CityPredictionAdapter(private val listCity: List<City>?, private val liste
 
         init {
             itemView.setOnClickListener {
-                listener.onCitySelected(mTvCityName.text.toString().trim())
+                listener.onCitySelected(mTvCityName.text.toString().trim().toLowerCase())
             }
         }
 

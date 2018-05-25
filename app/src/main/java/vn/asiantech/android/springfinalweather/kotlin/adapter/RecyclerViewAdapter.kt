@@ -33,7 +33,7 @@ class RecyclerViewAdapter(private val informationDetail: List<InformationDetail>
         private var mTvMaxTempList: TextView = itemView.findViewById(R.id.tvMaxTempList)
         private var mTvMinTempList: TextView = itemView.findViewById(R.id.tvMinTempList)
 
-        @SuppressLint("SimpleDateFormat", "SetTextI18n")
+        @SuppressLint("SetTextI18n")
         fun bind(informationDetail: InformationDetail) {
             mTvDate.text = informationDetail.datetime
             mTvDateStatus.text = informationDetail.weather.description

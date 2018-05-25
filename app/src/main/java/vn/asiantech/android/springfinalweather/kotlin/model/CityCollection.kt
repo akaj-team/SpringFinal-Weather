@@ -17,9 +17,12 @@ class CityCollection {
     var state = Constants.OTHER_LOCATION
     var temp: Float = 0F
     var appTemp: Float = 0F
+    lateinit var sunrise: String
+    lateinit var sunset: String
     var humidity: Int = 0
     var wind: Float = 0F
     var cloud: Int = 0
     lateinit var description: String
     var icon: String = "na"
+    var date: String = "dd/mm/yy"
 }
