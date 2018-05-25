@@ -2,12 +2,25 @@ package vn.asiantech.android.springfinalweather.kotlin.`object`
 
 class Constants {
     companion object {
+        // const for Location permission
         const val LOCATION_PERMISSION = "location_permission"
         const val UNIT_OF_TEMP = "unit_of_temp"
         const val UNIT_OF_WIND_SPEED = "unit_of_wind_speed"
         const val LOCATION_PERMISSION_REQUEST = 1
+
+        // const for Google find City Api
+        const val BASE_URL_API_GOOGLE = "https://maps.googleapis.com"
+        const val CITY_TYPES = "(cities)"
+        const val GOOGLE_KEY = "AIzaSyAvt30-GCmebRk-RB4QOlljVrCnepnyMHA"
+
+        //const for intent key
+        const val CITY_NAME = "city_name"
+
+        //const for OpenWheatherApi
         const val APP_ID = "3f5e5e2f4eb2916c08716ef5e4edb7e8"
         const val BASE_URL = "http://api.openweathermap.org"
+
+        //const for icon weather
         const val ICON_01D = "01d"
         const val ICON_01N = "01n"
         const val ICON_02D = "02d"

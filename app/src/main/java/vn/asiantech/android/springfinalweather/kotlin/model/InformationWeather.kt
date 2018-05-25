@@ -86,7 +86,6 @@ class InformationWeather {
          * icon : 03d
          */
 
-        var id: Int = 0
         var description: String? = null
         var icon: String? = null
     }
