@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.support.v4.app.Fragment
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -15,8 +17,11 @@ import retrofit2.Callback
 import retrofit2.Response
 import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
+import vn.asiantech.android.springfinalweather.kotlin.adapter.RecyclerViewAdapter
 import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiServices
-import vn.asiantech.android.springfinalweather.kotlin.model.InformationtWeather
+import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiServicesRecyclerView
+import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeatherRecyclerView
+import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeather
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,6 +40,14 @@ class FragmentShowWeatherForecast : Fragment() {
     private lateinit var mTvHumidity: TextView
     private lateinit var mTvCloud: TextView
     private lateinit var mTvWind: TextView
+//    private lateinit var mTvDate: TextView
+//    private lateinit var mTvDateStatus: TextView
+//    private lateinit var mImgIconDate: ImageView
+//    private lateinit var mTvMaxTempList: TextView
+//    private lateinit var mTvMinTempList: TextView
+    private lateinit var mRecyclerViewAdapter: RecyclerViewAdapter
+    private lateinit var mListInformationWeatherRecyclerView: List<InformationWeatherRecyclerView>
+    private lateinit var mRecyclerView: RecyclerView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_show_weather_forecast, container, false)
@@ -56,30 +69,40 @@ class FragmentShowWeatherForecast : Fragment() {
         mTvHumidity = view.findViewById(R.id.tvHumidity)
         mTvCloud = view.findViewById(R.id.tvCloud)
         mTvWind = view.findViewById(R.id.tvWind)
+//        mTvDate = view.findViewById(R.id.tvDate)
+//        mTvDateStatus = view.findViewById(R.id.tvDateStatus)
+//        mImgIconDate = view.findViewById(R.id.imgIconDate)
+//        mTvMaxTempList = view.findViewById(R.id.tvMaxTempList)
+//        mTvMinTempList = view.findViewById(R.id.tvMinTempList)
+        mRecyclerView = view.findViewById(R.id.recyclerView)
     }
 
     private fun loadInformationWeather(cityName: String) {
         val apiServices = ApiServices()
-        apiServices.getIEventWeather().getInformationWeather(cityName, Constants.APP_ID).enqueue(object : Callback<InformationtWeather> {
-            override fun onResponse(call: Call<InformationtWeather>, response: Response<InformationtWeather>) {
+        apiServices.getIEventWeather().getInformationWeather(cityName, Constants.APP_ID).enqueue(object : Callback<InformationWeather> {
+            override fun onResponse(call: Call<InformationWeather>, response: Response<InformationWeather>) {
                 if (response.body() != null) {
-                    showInformationWeather(Objects.requireNonNull<InformationtWeather>(response.body()))
+                    showInformationWeather(Objects.requireNonNull<InformationWeather>(response.body()))
+                    mRecyclerViewAdapter = RecyclerViewAdapter(mListInformationWeatherRecyclerView, cityName)
+                    mRecyclerView.adapter = mRecyclerViewAdapter
+                    mRecyclerView.layoutManager = LinearLayoutManager(context)
+                    mRecyclerViewAdapter.notifyDataSetChanged()
                 }
             }
 
-            override fun onFailure(call: Call<InformationtWeather>, t: Throwable) {
+            override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
                 Toast.makeText(context, R.string.notification, Toast.LENGTH_SHORT).show()
             }
         })
     }
 
     @SuppressLint("SetTextI18n")
-    private fun showInformationWeather(informationtWeather: InformationtWeather) {
-        val mainBean = informationtWeather.main
-        val sysBean = informationtWeather.sys
-        val weatherBean = informationtWeather.weather
-        val cloudsBean = informationtWeather.clouds
-        val windBean = informationtWeather.wind
+    private fun showInformationWeather(informationWeather: InformationWeather) {
+        val mainBean = informationWeather.main
+        val sysBean = informationWeather.sys
+        val weatherBean = informationWeather.weather
+        val cloudsBean = informationWeather.clouds
+        val windBean = informationWeather.wind
 
         mSharedPreferences = activity?.getSharedPreferences(
                 getString(R.string.shared_preference_name),
@@ -102,12 +125,12 @@ class FragmentShowWeatherForecast : Fragment() {
 
         @SuppressLint("SimpleDateFormat")
         val simpleDateFormat = SimpleDateFormat("EEEE dd-MM-yyyy")
-        val day = informationtWeather.dt
+        val day = informationWeather.dt
         val l = day.toLong()
         val date = Date(l * 1000L)
         val time = simpleDateFormat.format(date)
         mTvCurrentDay.text = time
-        mTvCountryName.text = informationtWeather.name + ", " + sysBean?.country
+        mTvCountryName.text = informationWeather.name + ", " + sysBean?.country
         val icon = weatherBean?.get(0)?.icon
         mImgIcon.setImageResource(getIcon(icon.toString()))
         mTvStatus.text = weatherBean?.get(0)?.description
@@ -165,12 +188,50 @@ class FragmentShowWeatherForecast : Fragment() {
         }
     }
 
+//    @SuppressLint("SimpleDateFormat")
+//    private fun showInformationWeatherRecyclerView(informationWeatherRecyclerView: InformationWeatherRecyclerView) {
+//        val listBean = informationWeatherRecyclerView.list?.get(0)
+//
+//        val simpleDateFormat = SimpleDateFormat("EEEE dd-MM-yyyy")
+//        val day = listBean?.dt
+//        val l = day?.toLong()
+//        val date = l?.times(1000L)?.let { Date(it) }
+//        val time = simpleDateFormat.format(date)
+//        mTvDate.text = time
+//        mTvDateStatus.text = listBean?.weather?.get(0)?.description
+//        mTvMaxTempList.text = listBean?.main?.temp_max.toString()
+//        mTvMinTempList.text = listBean?.main?.temp_min.toString()
+//
+//        val icon = listBean?.weather
+//        mImgIconDate.setImageResource(getIcon(icon.toString()))
+//    }
+//
+//    private fun loadInformationWeatherRecyclerView(cityName: String) {
+//        val apiServicesRecyclerView = ApiServicesRecyclerView()
+//        apiServicesRecyclerView.getIEventWeatherRecyclerView().getInformationWeatherRecyclerView(cityName, Constants.APP_ID).enqueue(object : Callback<InformationWeatherRecyclerView> {
+//            override fun onResponse(call: Call<InformationWeatherRecyclerView>?, response: Response<InformationWeatherRecyclerView>?) {
+//                if (response?.body() != null) {
+//                    mRecyclerViewAdapter = mListInformationWeatherRecyclerView.let { RecyclerViewAdapter(it) }
+//                    mRecyclerView.adapter = mRecyclerViewAdapter
+//                    mRecyclerView.layoutManager = LinearLayoutManager(context)
+//                    showInformationWeatherRecyclerView(Objects.requireNonNull<InformationWeatherRecyclerView>(response.body()))
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<InformationWeatherRecyclerView>?, t: Throwable?) {
+//                Toast.makeText(context, R.string.notification, Toast.LENGTH_SHORT).show()
+//            }
+//
+//        })
+//    }
+
     private fun setListener() {
         mBtnSearch.setOnClickListener { view ->
             if (view.id == R.id.btnSearch) {
                 val searchCity = mEdtSearch.text.toString().trim()
                 if (!TextUtils.isEmpty(searchCity)) {
                     loadInformationWeather(searchCity)
+//                    loadInformationWeatherRecyclerView(searchCity)
                 }
             }
         }

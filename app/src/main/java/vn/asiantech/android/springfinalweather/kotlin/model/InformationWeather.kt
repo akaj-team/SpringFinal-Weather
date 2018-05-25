@@ -2,7 +2,7 @@ package vn.asiantech.android.springfinalweather.kotlin.model
 
 import com.google.gson.annotations.SerializedName
 
-class InformationtWeather {
+class InformationWeather {
 
 
     /**
