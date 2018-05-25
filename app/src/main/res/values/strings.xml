@@ -26,4 +26,5 @@
     <string name="notification">Get location Failed</string>
     <string name="connect_fail">Fail to connect to the Internet</string>
     <string name="response_fail">Fail to get response from Api</string>
+    <string name="city_not_found">Sorry, but we can\'t found data of this city</string>
 </resources>
