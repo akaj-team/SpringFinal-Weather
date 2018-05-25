@@ -3,13 +3,14 @@ package vn.asiantech.android.springfinalweather.kotlin.fragment
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import android.support.v4.app.Fragment
 import android.os.Bundle
-import android.text.TextUtils
+import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -25,8 +26,6 @@ class FragmentShowWeatherForecast : Fragment() {
     private var mSharedPreferences: SharedPreferences? = null
     private lateinit var mTvCurrentDay: TextView
     private lateinit var mTvCountryName: TextView
-    private lateinit var mEdtSearch: EditText
-    private lateinit var mBtnSearch: Button
     private lateinit var mTvTemp: TextView
     private lateinit var mTvMaxTemp: TextView
     private lateinit var mTvMinTemp: TextView
@@ -39,15 +38,13 @@ class FragmentShowWeatherForecast : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_show_weather_forecast, container, false)
         initViews(view)
-        setListener()
+        initData()
         return view
     }
 
     private fun initViews(view: View) {
         mTvCurrentDay = view.findViewById(R.id.tvCurrentDay)
         mTvCountryName = view.findViewById(R.id.tvCountryName)
-        mEdtSearch = view.findViewById(R.id.edtSearch)
-        mBtnSearch = view.findViewById(R.id.btnSearch)
         mTvTemp = view.findViewById(R.id.tvTemp)
         mTvMaxTemp = view.findViewById(R.id.tvMaxTemp)
         mTvMinTemp = view.findViewById(R.id.tvMinTemp)
@@ -56,6 +53,13 @@ class FragmentShowWeatherForecast : Fragment() {
         mTvHumidity = view.findViewById(R.id.tvHumidity)
         mTvCloud = view.findViewById(R.id.tvCloud)
         mTvWind = view.findViewById(R.id.tvWind)
+    }
+
+    private fun initData() {
+        val bundle = arguments
+        if (bundle != null) {
+            loadInformationWeather(bundle.getString(Constants.CITY_NAME))
+        }
     }
 
     private fun loadInformationWeather(cityName: String) {
@@ -162,17 +166,6 @@ class FragmentShowWeatherForecast : Fragment() {
             Constants.ICON_50D -> return R.drawable.img_50d
             Constants.ICON_50N -> return R.drawable.img_50n
             else -> return R.drawable.img_sun
-        }
-    }
-
-    private fun setListener() {
-        mBtnSearch.setOnClickListener { view ->
-            if (view.id == R.id.btnSearch) {
-                val searchCity = mEdtSearch.text.toString().trim()
-                if (!TextUtils.isEmpty(searchCity)) {
-                    loadInformationWeather(searchCity)
-                }
-            }
         }
     }
 }
