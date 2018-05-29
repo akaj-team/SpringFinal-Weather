@@ -32,7 +32,9 @@ class FragmentShowWeatherForecast : Fragment() {
     private var mSharedPreferences: SharedPreferences? = null
     private lateinit var mTvCurrentDay: TextView
     private lateinit var mTvCountryName: TextView
+    private lateinit var mTvCurrentTime: TextView
     private lateinit var mTvTemp: TextView
+    private lateinit var mTvTempRealFeel: TextView
     private lateinit var mTvSunrise: TextView
     private lateinit var mTvSunset: TextView
     private lateinit var mImgIcon: ImageView
@@ -53,7 +55,9 @@ class FragmentShowWeatherForecast : Fragment() {
     private fun initViews(view: View) {
         mTvCurrentDay = view.findViewById(R.id.tvCurrentDay)
         mTvCountryName = view.findViewById(R.id.tvCountryName)
+        mTvCurrentTime = view.findViewById(R.id.tvCurrentTime)
         mTvTemp = view.findViewById(R.id.tvTemp)
+        mTvTempRealFeel = view.findViewById(R.id.tvTempRealFeel)
         mTvSunrise = view.findViewById(R.id.tvSunrise)
         mTvSunset = view.findViewById(R.id.tvSunset)
         mImgIcon = view.findViewById(R.id.imgIcon)
@@ -61,7 +65,6 @@ class FragmentShowWeatherForecast : Fragment() {
         mTvHumidity = view.findViewById(R.id.tvHumidity)
         mTvCloud = view.findViewById(R.id.tvCloud)
         mTvWind = view.findViewById(R.id.tvWind)
-
         mRecyclerView = view.findViewById(R.id.recyclerView)
     }
 
@@ -137,18 +140,22 @@ class FragmentShowWeatherForecast : Fragment() {
 
         if (mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0) == 0) {
             mTvTemp.text = informationWeather.data[0].temp.toString() + "°C"
+            mTvTempRealFeel.text = "Real Feel: " + informationWeather.data[0].appTemp.toString() + "°C"
 
         } else {
             mTvTemp.text = getFahrenheitDegree(informationWeather.data[0].temp).toString() + "°F"
+            mTvTempRealFeel.text = "Real Feel: " + informationWeather.data[0].appTemp.toString() + "°C"
         }
 
         @SuppressLint("SimpleDateFormat")
-        val simpleDateFormat = SimpleDateFormat("EEEE dd-MM-yyyy")
+        val simpleDateFormat = SimpleDateFormat("dd-MM-yyyy")
         val day = informationWeather.data[0].timeStamp
         val l = day.toLong()
         val date = Date(l * 1000L)
         val time = simpleDateFormat.format(date)
         mTvCurrentDay.text = time
+        val currentTime = Calendar.getInstance().time
+        mTvCurrentTime.text = currentTime.toString()
         mTvSunrise.text = informationWeather.data[0].sunrise
         mTvSunset.text = informationWeather.data[0].sunset
         mTvCountryName.text = informationWeather.data[0].cityName + ", " + informationWeather.data[0].countryCode
