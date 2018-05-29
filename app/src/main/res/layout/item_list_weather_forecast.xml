@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/tvDate"
@@ -10,7 +10,7 @@
         android:layout_marginLeft="10dp"
         android:gravity="center"
         android:text="@string/date"
-        android:textSize="30sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/tvDateStatus"
@@ -49,4 +49,11 @@
         android:layout_marginTop="5dp"
         android:text="@string/min_temp"
         android:textSize="20sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/tvDateStatus"
+        android:background="@color/colorGray"
+        />
 </RelativeLayout>

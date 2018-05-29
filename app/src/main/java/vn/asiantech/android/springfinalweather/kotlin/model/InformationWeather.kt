@@ -2,7 +2,7 @@ package vn.asiantech.android.springfinalweather.kotlin.model
 
 import com.google.gson.annotations.SerializedName
 
-class InformationWeather (val data: List<Detail>)
+class InformationWeather(val data: List<Detail>)
 
 data class Detail(val pod: String,
                   @SerializedName("country_code") val countryCode: String,
@@ -17,5 +17,6 @@ data class Detail(val pod: String,
                   val sunset: String,
                   val sunrise: String,
                   @SerializedName("app_temp") val appTemp: Float)
+
 data class WeatherBean(val icon: String,
                        val description: String)

@@ -16,9 +16,10 @@ class Constants {
         //const for intent key
         const val CITY_NAME = "city_name"
 
-        //const for OpenWheatherApi
+        //const for OpenWeatherApi
         const val KEY = "a459656b3fac458db1b94198b8262f93"
         const val BASE_URL = "https://api.weatherbit.io"
+        const val DAYS = "5"
 
         //const for icon weather
         const val ICON_T01D = "t01d"
