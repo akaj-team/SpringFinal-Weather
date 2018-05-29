@@ -17,8 +17,7 @@ import retrofit2.Response
 import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiServices
-import vn.asiantech.android.springfinalweather.kotlin.model.InformationtWeather
-import java.math.BigDecimal
+import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeather
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,8 +26,8 @@ class FragmentShowWeatherForecast : Fragment() {
     private lateinit var mTvCurrentDay: TextView
     private lateinit var mTvCountryName: TextView
     private lateinit var mTvTemp: TextView
-    private lateinit var mTvMaxTemp: TextView
-    private lateinit var mTvMinTemp: TextView
+    private lateinit var mTvSunrise: TextView
+    private lateinit var mTvSunset: TextView
     private lateinit var mImgIcon: ImageView
     private lateinit var mTvStatus: TextView
     private lateinit var mTvHumidity: TextView
@@ -46,8 +45,8 @@ class FragmentShowWeatherForecast : Fragment() {
         mTvCurrentDay = view.findViewById(R.id.tvCurrentDay)
         mTvCountryName = view.findViewById(R.id.tvCountryName)
         mTvTemp = view.findViewById(R.id.tvTemp)
-        mTvMaxTemp = view.findViewById(R.id.tvMaxTemp)
-        mTvMinTemp = view.findViewById(R.id.tvMinTemp)
+        mTvSunrise = view.findViewById(R.id.tvSunrise)
+        mTvSunset = view.findViewById(R.id.tvSunset)
         mImgIcon = view.findViewById(R.id.imgIcon)
         mTvStatus = view.findViewById(R.id.tvStatus)
         mTvHumidity = view.findViewById(R.id.tvHumidity)
@@ -64,85 +63,66 @@ class FragmentShowWeatherForecast : Fragment() {
 
     private fun loadInformationWeather(cityName: String) {
         val apiServices = ApiServices()
-        apiServices.getIEventWeather().getInformationWeather(cityName, Constants.APP_ID).enqueue(object : Callback<InformationtWeather> {
-            override fun onResponse(call: Call<InformationtWeather>, response: Response<InformationtWeather>) {
+        apiServices.getIEventWeather().getInformationWeather(cityName, Constants.APP_ID).enqueue(object : Callback<InformationWeather> {
+            override fun onResponse(call: Call<InformationWeather>, response: Response<InformationWeather>) {
                 if (response.body() != null) {
-                    showInformationWeather(Objects.requireNonNull<InformationtWeather>(response.body()))
+                    showInformationWeather(Objects.requireNonNull<InformationWeather>(response.body()))
                 }
             }
 
-            override fun onFailure(call: Call<InformationtWeather>, t: Throwable) {
+            override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
                 Toast.makeText(context, R.string.notification, Toast.LENGTH_SHORT).show()
             }
         })
     }
 
     @SuppressLint("SetTextI18n")
-    private fun showInformationWeather(informationtWeather: InformationtWeather) {
-        val mainBean = informationtWeather.main
-        val sysBean = informationtWeather.sys
-        val weatherBean = informationtWeather.weather
-        val cloudsBean = informationtWeather.clouds
-        val windBean = informationtWeather.wind
-
+    private fun showInformationWeather(informationWeather: InformationWeather) {
         mSharedPreferences = activity?.getSharedPreferences(
                 getString(R.string.shared_preference_name),
                 Context.MODE_PRIVATE)
         if (mSharedPreferences?.getInt(Constants.UNIT_OF_WIND_SPEED, 0) == 0) {
-            mTvWind.text = getKilometer(windBean?.speed?.toFloat()).toString() + " km/h"
+            mTvWind.text = getKilometer(informationWeather.data[0].windSpeed).toString() + " km/h"
         } else {
-            mTvWind.text = windBean?.speed.toString() + " m/s"
+            mTvWind.text = informationWeather.data[0].windSpeed.toString() + " m/s"
         }
 
         if (mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0) == 0) {
-            mTvTemp.text = getCelsiusDegree(mainBean?.temp?.toFloat()).toString() + "°C"
-            mTvMaxTemp.text = getCelsiusDegree(mainBean?.tempMax?.toFloat()).toString() + "°C"
-            mTvMinTemp.text = getCelsiusDegree(mainBean?.tempMin?.toFloat()).toString() + "°C"
+            mTvTemp.text = informationWeather.data[0].temp.toString() + "°C"
+
         } else {
-            mTvTemp.text = getFahrenheitDegree(mainBean?.temp?.toFloat()).toString() + "°F"
-            mTvMaxTemp.text = getFahrenheitDegree(mainBean?.tempMax?.toFloat()).toString() + "°F"
-            mTvMinTemp.text = getFahrenheitDegree(mainBean?.tempMin?.toFloat()).toString() + "°F"
+            mTvTemp.text = getFahrenheitDegree(informationWeather.data[0].temp).toString() + "°F"
         }
 
         @SuppressLint("SimpleDateFormat")
         val simpleDateFormat = SimpleDateFormat("EEEE dd-MM-yyyy")
-        val day = informationtWeather.dt
+        val day = informationWeather.data[0].timeStamp
         val l = day.toLong()
         val date = Date(l * 1000L)
         val time = simpleDateFormat.format(date)
         mTvCurrentDay.text = time
-        mTvCountryName.text = informationtWeather.name + ", " + sysBean?.country
-        val icon = weatherBean?.get(0)?.icon
-        mImgIcon.setImageResource(getIcon(icon.toString()))
-        mTvStatus.text = weatherBean?.get(0)?.description
-        mTvHumidity.text = mainBean?.humidity.toString() + "%"
-        mTvCloud.text = cloudsBean?.all.toString() + "%"
+        mTvSunrise.text = informationWeather.data[0].sunrise
+        mTvSunset.text = informationWeather.data[0].sunset
+        mTvCountryName.text = informationWeather.data[0].cityName + ", " + informationWeather.data[0].countryCode
+        val icon = informationWeather.data[0].weather.icon
+        mImgIcon.setImageResource(getIcon(icon))
+        mTvStatus.text = informationWeather.data[0].weather.description
+        mTvHumidity.text = informationWeather.data[0].humidity.toString() + "%"
+        mTvCloud.text = informationWeather.data[0].clouds.toString() + "%"
     }
 
-    private fun getKilometer(speed: Float?): Float? {
-        val convert = BigDecimal("3.6")
-        val kilometer = convert.setScale(2, BigDecimal.ROUND_HALF_EVEN).toFloat()
-        return (speed?.times(kilometer))
+    private fun getKilometer(speed: Float): Float {
+        val convert = 3.6
+        val kilometer = speed.times(convert)
+        val result = Math.round(kilometer.toFloat().times(10)) / 10.0
+        return result.toFloat()
     }
 
-    private fun getCelsiusDegree(cel: Float?): Float? {
-        if (cel != null) {
-            val convert = 273.15
-            val celsius = cel.minus(convert)
-            val result = Math.round(celsius.toFloat().times(10)) / 10.0
-            return result.toFloat()
-        }
-        return cel
-    }
-
-    private fun getFahrenheitDegree(fah: Float?): Float? {
-        if (fah != null) {
-            val convert = 2.0
-            val fahrenheit = fah.div(convert)
-            val result = Math.round(fahrenheit.toFloat().times(10)) / 10.0
-            return result.toFloat()
-        }
-        return fah
+    private fun getFahrenheitDegree(fah: Float): Float {
+        val convert = 33.8
+        val fahrenheit = fah.times(convert)
+        val result = Math.round(fahrenheit.toFloat().times(10)) / 10.0
+        return result.toFloat()
     }
 
     private fun getIcon(icon: String): Int {

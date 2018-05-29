@@ -17,8 +17,8 @@ class Constants {
         const val CITY_NAME = "city_name"
 
         //const for OpenWheatherApi
-        const val APP_ID = "3f5e5e2f4eb2916c08716ef5e4edb7e8"
-        const val BASE_URL = "http://api.openweathermap.org"
+        const val APP_ID = "a459656b3fac458db1b94198b8262f93"
+        const val BASE_URL = "https://api.weatherbit.io"
 
         //const for icon weather
         const val ICON_01D = "01d"
