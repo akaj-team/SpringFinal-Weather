@@ -21,8 +21,10 @@ import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.adapter.RecyclerViewAdapter
 import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiServices
 import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiServicesRecyclerView
+import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
 import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeather
 import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeatherRecyclerView
+import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -75,7 +77,12 @@ class FragmentShowWeatherForecast : Fragment() {
         apiServices.getIEventWeather().getInformationWeather(cityName, Constants.KEY).enqueue(object : Callback<InformationWeather> {
             override fun onResponse(call: Call<InformationWeather>, response: Response<InformationWeather>) {
                 if (response.body() != null) {
-                    showInformationWeather(Objects.requireNonNull<InformationWeather>(response.body()))
+                    response.body()?.let {
+                        saveNewCityCollection(it)
+                        showInformationWeather(it)
+                    }
+                } else {
+                    Toast.makeText(context, R.string.city_not_found, Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -100,6 +107,21 @@ class FragmentShowWeatherForecast : Fragment() {
             }
 
         })
+    }
+
+    private fun saveNewCityCollection(informationWeather: InformationWeather) {
+        val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
+        val cityCollection = CityCollection()
+        cityCollection.cityName = informationWeather.data[0].cityName
+        cityCollection.countryName = informationWeather.data[0].countryCode
+        cityCollection.temp = informationWeather.data[0].temp
+        cityCollection.appTemp = informationWeather.data[0].appTemp
+        cityCollection.humidity = informationWeather.data[0].humidity
+        cityCollection.wind = informationWeather.data[0].windSpeed
+        cityCollection.cloud = informationWeather.data[0].clouds
+        cityCollection.description = informationWeather.data[0].weather.description
+        cityCollection.icon = informationWeather.data[0].weather.icon
+        weatherRepository?.insert(cityCollection)
     }
 
     @SuppressLint("SetTextI18n")
@@ -217,7 +239,7 @@ class FragmentShowWeatherForecast : Fragment() {
             Constants.ICON_U00N -> return R.drawable.img_13n
             Constants.ICON_C04D -> return R.drawable.img_04d
             Constants.ICON_C04N -> return R.drawable.img_04n
-            else -> return R.drawable.img_sun
+            else -> return R.drawable.img_na
         }
     }
 }
