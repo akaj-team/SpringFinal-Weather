@@ -86,5 +86,9 @@ class Constants {
         const val ICON_C04N = "c04n"
         const val ICON_U00D = "u00d"
         const val ICON_U00N = "u00n"
+
+        //const for State of City Collection
+        const val USER_LOCATION = true
+        const val OTHER_LOCATION = false
     }
 }

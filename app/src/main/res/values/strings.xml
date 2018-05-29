@@ -30,4 +30,5 @@
     <string name="max_temp">Max Temp</string>
     <string name="min_temp">Min Temp</string>
     <string name="current_time">Current Time</string>
+    <string name="city_not_found">Sorry, but we can\'t found data of this city</string>
 </resources>
