@@ -7,5 +7,5 @@ import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeatherRe
 
 interface IEventWeatherRecyclerView {
     @GET("/v2.0/forecast/daily")
-    fun getInformationWeatherRecyclerView(@Query("city") cityName: String, @Query("key") key: String): Call<InformationWeatherRecyclerView>
+    fun getInformationWeatherRecyclerView(@Query("city") cityName: String, @Query("days") days: String, @Query("key") key: String): Call<InformationWeatherRecyclerView>
 }

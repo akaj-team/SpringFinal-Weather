@@ -9,9 +9,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import vn.asiantech.android.springfinalweather.R
-import vn.asiantech.android.springfinalweather.kotlin.model.Detail
+import vn.asiantech.android.springfinalweather.kotlin.model.InformationDetail
 
-class RecyclerViewAdapter(private val weatherDetail: List<Detail>) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
+class RecyclerViewAdapter(private val informationDetail: List<InformationDetail>) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_list_weather_forecast, parent, false)
@@ -19,11 +19,11 @@ class RecyclerViewAdapter(private val weatherDetail: List<Detail>) : RecyclerVie
     }
 
     override fun getItemCount(): Int {
-        return weatherDetail.size
+        return informationDetail.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(weatherDetail[position])
+        holder.bind(informationDetail[position])
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -34,12 +34,12 @@ class RecyclerViewAdapter(private val weatherDetail: List<Detail>) : RecyclerVie
         private var mTvMinTempList: TextView = itemView.findViewById(R.id.tvMinTempList)
 
         @SuppressLint("SimpleDateFormat", "SetTextI18n")
-        fun bind(weatherDetail: Detail) {
-            mTvDate.text = weatherDetail.datetime
-            mTvDateStatus.text = weatherDetail.weather.description
-            mTvMaxTempList.text = weatherDetail.maxTemp.toFloat().toString() + "C"
-            mTvMinTempList.text = weatherDetail.minTemp.toFloat().toString() + "C"
-            val icon = weatherDetail.weather.icon
+        fun bind(informationDetail: InformationDetail) {
+            mTvDate.text = informationDetail.datetime
+            mTvDateStatus.text = informationDetail.weather.description
+            mTvMaxTempList.text = informationDetail.maxTemp.toFloat().toString() + "°C"
+            mTvMinTempList.text = informationDetail.minTemp.toFloat().toString() + "°C"
+            val icon = informationDetail.weather.icon
             Glide.with(itemView.context)
                     .load("https://www.weatherbit.io/static/img/icons/$icon.png")
                     .into(mImgIconDate)

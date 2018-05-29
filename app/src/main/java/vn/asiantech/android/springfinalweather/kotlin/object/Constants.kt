@@ -16,33 +16,12 @@ class Constants {
         //const for intent key
         const val CITY_NAME = "city_name"
 
-        //const for OpenWheatherApi
-        const val APP_ID = "3f5e5e2f4eb2916c08716ef5e4edb7e8"
-        const val APP_ID1 = "a459656b3fac458db1b94198b8262f93"
-        const val BASE_URL = "http://api.openweathermap.org"
-        const val BASE_URL1 = "http://api.weatherbit.io"
+        //const for OpenWeatherApi
+        const val KEY = "a459656b3fac458db1b94198b8262f93"
+        const val BASE_URL = "https://api.weatherbit.io"
+        const val DAYS = "5"
 
         //const for icon weather
-        const val ICON_01D = "01d"
-        const val ICON_01N = "01n"
-        const val ICON_02D = "02d"
-        const val ICON_02N = "02n"
-        const val ICON_03D = "03d"
-        const val ICON_03N = "03n"
-        const val ICON_04D = "04d"
-        const val ICON_04N = "04n"
-        const val ICON_09D = "09d"
-        const val ICON_09N = "09n"
-        const val ICON_10D = "10d"
-        const val ICON_10N = "10n"
-        const val ICON_11D = "11d"
-        const val ICON_11N = "11n"
-        const val ICON_13D = "13d"
-        const val ICON_13N = "13n"
-        const val ICON_50D = "50d"
-        const val ICON_50N = "50n"
-
-        //const for icon list weather forecast
         const val ICON_T01D = "t01d"
         const val ICON_T01N = "t01n"
         const val ICON_T02D = "t02d"

@@ -6,6 +6,6 @@ import retrofit2.http.Query
 import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeather
 
 interface IEventWeather {
-    @GET("/data/2.5/weather")
-    fun getInformationWeather(@Query("q") cityName: String, @Query("appid") app_id: String): Call<InformationWeather>
+    @GET("/v2.0/current")
+    fun getInformationWeather(@Query("city") cityName: String, @Query("key") key: String): Call<InformationWeather>
 }
