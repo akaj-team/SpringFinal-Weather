@@ -14,7 +14,7 @@ class ApiServicesRecyclerView {
 
     init {
         val retrofit = Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
+                .baseUrl(Constants.BASE_URL1)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
         mIEventWeatherRecyclerView = retrofit.create(IEventWeatherRecyclerView::class.java)

@@ -4,9 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,8 +20,9 @@ import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.adapter.RecyclerViewAdapter
 import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiServices
-import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeatherRecyclerView
+import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiServicesRecyclerView
 import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeather
+import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeatherRecyclerView
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.*
@@ -39,7 +40,6 @@ class FragmentShowWeatherForecast : Fragment() {
     private lateinit var mTvCloud: TextView
     private lateinit var mTvWind: TextView
     private lateinit var mRecyclerViewAdapter: RecyclerViewAdapter
-    private lateinit var mListInformationWeatherRecyclerView: List<InformationWeatherRecyclerView>
     private lateinit var mRecyclerView: RecyclerView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -77,16 +77,29 @@ class FragmentShowWeatherForecast : Fragment() {
             override fun onResponse(call: Call<InformationWeather>, response: Response<InformationWeather>) {
                 if (response.body() != null) {
                     showInformationWeather(Objects.requireNonNull<InformationWeather>(response.body()))
-                    mRecyclerViewAdapter = RecyclerViewAdapter(mListInformationWeatherRecyclerView, cityName)
-                    mRecyclerView.adapter = mRecyclerViewAdapter
-                    mRecyclerView.layoutManager = LinearLayoutManager(context)
-                    mRecyclerViewAdapter.notifyDataSetChanged()
                 }
             }
 
             override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
                 Toast.makeText(context, R.string.notification, Toast.LENGTH_SHORT).show()
             }
+        })
+
+        val apiServicesRecyclerView = ApiServicesRecyclerView()
+        apiServicesRecyclerView.getIEventWeatherRecyclerView().getInformationWeatherRecyclerView(cityName, Constants.APP_ID1).enqueue(object : Callback<InformationWeatherRecyclerView> {
+            override fun onResponse(call: Call<InformationWeatherRecyclerView>?, response: Response<InformationWeatherRecyclerView>?) {
+                if (response?.body() != null) {
+                    mRecyclerViewAdapter = RecyclerViewAdapter(response.body()!!.data)
+                    mRecyclerView.adapter = mRecyclerViewAdapter
+                    mRecyclerView.layoutManager = LinearLayoutManager(context)
+                    mRecyclerViewAdapter.notifyDataSetChanged()
+                }
+            }
+
+            override fun onFailure(call: Call<InformationWeatherRecyclerView>?, t: Throwable?) {
+                Toast.makeText(context, R.string.notification, Toast.LENGTH_SHORT).show()
+            }
+
         })
     }
 

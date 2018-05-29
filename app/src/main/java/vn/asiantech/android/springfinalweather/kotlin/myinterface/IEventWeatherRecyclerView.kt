@@ -6,6 +6,6 @@ import retrofit2.http.Query
 import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeatherRecyclerView
 
 interface IEventWeatherRecyclerView {
-    @GET("/data/2.5/forecast")
-    fun getInformationWeatherRecyclerView(@Query("q") cityName: String, @Query("appid") app_id: String): Call<InformationWeatherRecyclerView>
+    @GET("/v2.0/forecast/daily")
+    fun getInformationWeatherRecyclerView(@Query("city") cityName: String, @Query("key") key: String): Call<InformationWeatherRecyclerView>
 }
