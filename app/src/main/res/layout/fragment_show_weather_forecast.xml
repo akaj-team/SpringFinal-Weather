@@ -33,7 +33,7 @@
             android:textSize="35sp" />
 
         <TextView
-            android:id="@+id/tvMaxTemp"
+            android:id="@+id/tvSunrise"
             android:layout_width="80dp"
             android:layout_height="50dp"
             android:layout_below="@+id/tvCountryName"
@@ -43,7 +43,7 @@
             android:textSize="15sp" />
 
         <TextView
-            android:id="@+id/tvMinTemp"
+            android:id="@+id/tvSunset"
             android:layout_width="80dp"
             android:layout_height="50dp"
             android:layout_alignBottom="@+id/tvTemp"
