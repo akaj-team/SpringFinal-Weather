@@ -5,7 +5,7 @@ import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
 
 @Dao
 interface CityCollectionDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(cityCollection: CityCollection)
 
     @Update

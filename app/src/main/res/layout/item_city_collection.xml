@@ -1,19 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rlContent"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:layout_height="50dp"
+    android:background="@drawable/bg_tv_when_press"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
     <TextView
         android:id="@+id/tvCityName"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginLeft="20dp"
-        android:gravity="center_vertical"
-        android:textStyle="bold" />
-
-    <ImageButton
-        android:id="@+id/imgBtnStateOrDelete"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="20dp"
+        android:layout_toLeftOf="@id/imgBtnStateOrDelete"
+        android:gravity="center_vertical"
+        android:textSize="18sp" />
+
+    <ImageView
+        android:id="@+id/imgBtnStateOrDelete"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:padding="18dp"
+        android:src="@drawable/ic_cancel_black_24dp" />
+</RelativeLayout>
