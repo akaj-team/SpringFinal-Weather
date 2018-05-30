@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var mImgMenuIcon: ImageView
     private lateinit var mTvTitle: TextView
+    private lateinit var mTvDate: TextView
     private lateinit var mViewPager: ViewPager
     private lateinit var mViewPagerAdapter: ViewPagerAdapter
     private lateinit var mTvSetting: TextView
@@ -45,14 +46,14 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mCityName: String
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mCityCollectionAdapter: CityCollectionAdapter
-    private lateinit var mListCityCollection: MutableList<CityCollection>
+    private var mListCityCollection: MutableList<CityCollection> = mutableListOf()
     private var mFocusName: String = ""
     private var isNewData = false
     private var isAddLocation = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_start)
+        setContentView(R.layout.activity_main)
         initViews()
         initListener()
     }
@@ -71,26 +72,43 @@ class MainActivity : AppCompatActivity(),
         mDrawerLayout = findViewById(R.id.drawerLayout)
         mImgMenuIcon = findViewById(R.id.imgMenuIcon)
         mTvTitle = findViewById(R.id.tvTitle)
+        mTvDate = findViewById(R.id.tvDate)
         mTvSetting = findViewById(R.id.tvSetting)
         mTvAddLocation = findViewById(R.id.tvAddLocation)
         mRecyclerView = findViewById(R.id.recyclerViewLocation)
     }
 
-    private fun initViewPager() {
-        mViewPagerAdapter = ViewPagerAdapter(supportFragmentManager, mListCityCollection, this)
-        mViewPager.adapter = mViewPagerAdapter
+    private fun reloadViewPager() {
+        mViewPagerAdapter.notifyDataSetChanged()
     }
 
-    private fun initListCityCollection() {
-        mCityCollectionAdapter = CityCollectionAdapter(mListCityCollection, this)
+    private fun reloadListCityCollection() {
         mCityCollectionAdapter.setFocusItem(mFocusName)
-        mRecyclerView.adapter = mCityCollectionAdapter
-        mRecyclerView.layoutManager = LinearLayoutManager(this)
+        mCityCollectionAdapter.notifyDataSetChanged()
     }
 
     private fun initData() {
         val weatherRepository = WeatherRepository(this)
         weatherRepository.getAllCityCollection(this)
+        mViewPagerAdapter = ViewPagerAdapter(supportFragmentManager, mListCityCollection)
+        mViewPager.adapter = mViewPagerAdapter
+        mViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            }
+
+            @SuppressLint("SetTextI18n")
+            override fun onPageSelected(position: Int) {
+                mFocusName = mListCityCollection[position].cityName
+                mTvTitle.text = "$mFocusName - ${mListCityCollection[position].countryName}"
+                mTvDate.text = mListCityCollection[position].date
+            }
+        })
+        mCityCollectionAdapter = CityCollectionAdapter(mListCityCollection, this)
+        mRecyclerView.adapter = mCityCollectionAdapter
+        mRecyclerView.layoutManager = LinearLayoutManager(this)
     }
 
     private fun initListener() {
@@ -124,26 +142,38 @@ class MainActivity : AppCompatActivity(),
 
     override fun onLoadListListener(listCityCollection: List<CityCollection>) {
         val sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE)
-        mFocusName = sharedPreferences.getString(Constants.FOCUS_POSITION, "")
-        mListCityCollection = listCityCollection.toMutableList()
+        mListCityCollection.clear()
+        var hasFocusName = false
+        var index = 0
+        if (listCityCollection.isNotEmpty()) {
+            mFocusName = sharedPreferences.getString(Constants.FOCUS_POSITION, listCityCollection[0].cityName)
+            listCityCollection.forEach {
+                mListCityCollection.add(it)
+                if (mFocusName == it.cityName) {
+                    hasFocusName = true
+                    index = listCityCollection.indexOf(it)
+                }
+            }
+            if (!hasFocusName) {
+                mFocusName = listCityCollection[0].cityName
+            }
+            reloadViewPager()
+            mViewPager.currentItem = index
+        }
         if (isOnline() && !isNewData) {
             mListCityCollection.forEach { loadInformationWeather(it.cityName) }
             isNewData = true
             initData()
         }
-        initListCityCollection()
-        initViewPager()
+        reloadListCityCollection()
     }
 
     private fun addNewCityCollection(cityCollection: CityCollection) {
-        val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
         var index: Int? = null
         for (city in mListCityCollection) {
             if (city.cityName == cityCollection.cityName) {
                 index = mListCityCollection.indexOf(city)
                 mFocusName = cityCollection.cityName
-                editor.putString(Constants.FOCUS_POSITION, mFocusName)
-                editor.apply()
                 mViewPager.currentItem = index
                 break
             }
@@ -151,31 +181,29 @@ class MainActivity : AppCompatActivity(),
         if (index == null) {
             mListCityCollection.add(cityCollection)
             mFocusName = cityCollection.cityName
-            editor.putString(Constants.FOCUS_POSITION, mFocusName)
-            editor.apply()
-            mCityCollectionAdapter.setFocusItem(mFocusName)
-            mCityCollectionAdapter.notifyDataSetChanged()
-            mViewPagerAdapter.notifyDataSetChanged()
+            reloadListCityCollection()
+            reloadViewPager()
             mViewPager.currentItem = mListCityCollection.size - 1
         }
     }
 
     override fun onDeleteCityCollection(cityCollection: CityCollection) {
-        val weatherRepository = WeatherRepository(this)
-        weatherRepository.delete(cityCollection)
+//        val weatherRepository = WeatherRepository(this)
+//        weatherRepository.delete(cityCollection)
         if (mListCityCollection.size > 1) {
             if (cityCollection.cityName == mFocusName) {
                 mListCityCollection.remove(cityCollection)
-                mFocusName = mListCityCollection[0].cityName
-                mCityCollectionAdapter.setFocusItem(mFocusName)
-                mCityCollectionAdapter.notifyDataSetChanged()
-                mViewPagerAdapter.notifyDataSetChanged()
+                reloadViewPager()
                 mViewPager.currentItem = 0
+                mFocusName = mListCityCollection[0].cityName
+                reloadListCityCollection()
             } else {
                 mListCityCollection.remove(cityCollection)
-                mCityCollectionAdapter.notifyDataSetChanged()
+                reloadListCityCollection()
+                reloadViewPager()
             }
         } else {
+            mListCityCollection.clear()
             goTo(SearchActivity::class.java)
         }
     }
@@ -186,8 +214,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onDrawerStateChanged(newState: Int) {
-        mCityCollectionAdapter.setFocusItem(mFocusName)
-        mCityCollectionAdapter.notifyDataSetChanged()
+        reloadListCityCollection()
     }
 
     override fun onDrawerOpened(drawerView: View) {
@@ -242,7 +269,7 @@ class MainActivity : AppCompatActivity(),
 
     @SuppressLint("SimpleDateFormat")
     private fun formatDate(timeStamp: Int): String {
-        val simpleDateFormat = SimpleDateFormat("MM-dd-yyyy")
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
         val date = Date(timeStamp * 1000L)
         return simpleDateFormat.format(date)
     }

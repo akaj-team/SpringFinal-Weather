@@ -7,6 +7,7 @@ import vn.asiantech.android.springfinalweather.kotlin.dao.CityWeatherDao
 import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
 import vn.asiantech.android.springfinalweather.kotlin.model.CityWeather
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionAsyncListener
+import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityWeatherAsyncListener
 
 class WeatherRepository(context: Context) {
     private lateinit var mCityWeatherDao: CityWeatherDao
@@ -29,18 +30,18 @@ class WeatherRepository(context: Context) {
     }
 
     fun delete(cityCollection: CityCollection) {
-        DeleteCityCollectionAsyncTask(mCityCollectionDao).execute(cityCollection)
+        DeleteCityCollectionAsyncTask(mCityCollectionDao, mCityWeatherDao).execute(cityCollection)
     }
 
-    fun getCityWeatherBy(date: String): List<CityWeather> {
-        return mCityWeatherDao.getCityWeatherBy(date)
+    fun getCityWeatherBy(cityName: String, listener: OnCityWeatherAsyncListener) {
+        GetAllCityWeatherAsyncTask(mCityWeatherDao, listener, cityName).execute()
     }
 
     fun insert(cityWeather: CityWeather) {
         InsertCityWeatherAsyncTask(mCityWeatherDao).execute(cityWeather)
     }
 
-    fun delete(cityWeather: CityWeather) {
-        DeleteCityWeatherAsyncTask(mCityWeatherDao).execute(cityWeather)
+    fun deleteBy(cityName: String) {
+        DeleteCityWeatherAsyncTask(mCityWeatherDao, cityName).execute()
     }
 }
