@@ -40,7 +40,7 @@ class RecyclerViewAdapter(private val mListCityWeather: List<CityWeather>) : Rec
             mTvMaxTempList.text = cityWeather.tempMin.toString() + "°C"
             mTvMinTempList.text = cityWeather.tempMax.toString() + "°C"
             val icon = cityWeather.icon
-            mImgIconDate.setImageResource(Image.getIcon(icon))
+            mImgIconDate.setImageResource(Image.getIcon(icon, 1))
         }
     }
 }

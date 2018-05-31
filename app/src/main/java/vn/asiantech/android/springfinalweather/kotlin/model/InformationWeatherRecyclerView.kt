@@ -3,14 +3,26 @@ package vn.asiantech.android.springfinalweather.kotlin.model
 import com.google.gson.annotations.SerializedName
 
 
-class InformationWeatherRecyclerView(val data: List<InformationDetail>)
-
-class InformationDetail(val datetime: String,
-                        val weather: WeatherDetail,
-                        @SerializedName("max_temp") val maxTemp: Float,
-                        @SerializedName("min_temp") val minTemp: Float
+class InformationWeatherRecyclerView(
+        @SerializedName("forecast") val forecast: ForecastInformation
 )
 
-class WeatherDetail(val icon: String,
-                    val description: String
+class ForecastInformation(
+        @SerializedName("forecastday") val forecastDay: List<ForecastDayInfo>
+)
+
+class ForecastDayInfo(
+        @SerializedName("date") val date: String,
+        @SerializedName("day") val day: DayWeather
+)
+
+class DayWeather(
+        @SerializedName("maxtemp_c") val maxTemp: Float,
+        @SerializedName("mintemp_c") val minTemp: Float,
+        @SerializedName("condition") val condition: ConditionDay
+)
+
+class ConditionDay(
+        @SerializedName("code") val icon: String,
+        @SerializedName("text") val description: String
 )

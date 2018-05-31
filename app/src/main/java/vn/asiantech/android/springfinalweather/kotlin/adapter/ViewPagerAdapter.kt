@@ -31,14 +31,13 @@ class ViewPagerAdapter(fm: FragmentManager, private var mListCityCollection: Mut
         bundle.putString(Constants.DATE, cityCollection.date)
         bundle.putString(Constants.COUNTRY_NAME, cityCollection.countryName)
         bundle.putFloat(Constants.TEMP, cityCollection.temp)
-        bundle.putFloat(Constants.APPTEMP, cityCollection.temp)
-        bundle.putString(Constants.SUNRISE, cityCollection.sunrise)
-        bundle.putString(Constants.SUNSET, cityCollection.sunset)
+        bundle.putFloat(Constants.APPTEMP, cityCollection.appTemp)
         bundle.putInt(Constants.HUMIDITY, cityCollection.humidity)
         bundle.putFloat(Constants.WIND, cityCollection.wind)
         bundle.putInt(Constants.CLOUD, cityCollection.cloud)
         bundle.putString(Constants.DESCRIPTION, cityCollection.description)
         bundle.putString(Constants.ICON, cityCollection.icon)
+        bundle.putInt(Constants.IS_DAY, cityCollection.day)
         fragmentShowWeatherForecast.arguments = bundle
         return fragmentShowWeatherForecast
     }
