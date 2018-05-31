@@ -28,7 +28,7 @@ class Constants {
         const val ICON = "icon"
 
         //const for OpenWeatherApi
-        const val KEY = "a68a83bd5b6c4fb2aa613614ae302d40"
+        const val KEY = "2990381aeee141bf8d86abf206a60d76"
         const val BASE_URL = "https://api.weatherbit.io"
         const val DAYS = "5"
 

@@ -140,6 +140,7 @@ class MainActivity : AppCompatActivity(),
         return false
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onLoadListListener(listCityCollection: List<CityCollection>) {
         val sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE)
         mListCityCollection.clear()
@@ -159,6 +160,8 @@ class MainActivity : AppCompatActivity(),
             }
             reloadViewPager()
             mViewPager.currentItem = index
+            mTvTitle.text = "$mFocusName - ${mListCityCollection[index].countryName}"
+            mTvDate.text = mListCityCollection[index].date
         }
         if (isOnline() && !isNewData) {
             mListCityCollection.forEach { loadInformationWeather(it.cityName) }
@@ -187,6 +190,7 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onDeleteCityCollection(cityCollection: CityCollection) {
 //        val weatherRepository = WeatherRepository(this)
 //        weatherRepository.delete(cityCollection)
@@ -196,8 +200,13 @@ class MainActivity : AppCompatActivity(),
                 reloadViewPager()
                 mViewPager.currentItem = 0
                 mFocusName = mListCityCollection[0].cityName
+                mTvTitle.text = "$mFocusName - ${mListCityCollection[0].countryName}"
+                mTvDate.text = mListCityCollection[0].date
                 reloadListCityCollection()
             } else {
+                if (mViewPager.currentItem > mListCityCollection.indexOf(cityCollection)) {
+                    mViewPager.currentItem = mListCityCollection.indexOf(cityCollection) + 1
+                }
                 mListCityCollection.remove(cityCollection)
                 reloadListCityCollection()
                 reloadViewPager()
