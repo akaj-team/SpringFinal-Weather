@@ -1,90 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scrollView"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rlContent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:scrollbars="vertical">
+    android:layout_height="match_parent">
 
-    <RelativeLayout
+    <ImageView
+        android:id="@+id/imgIcon"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="290dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
-        <ImageView
-            android:id="@+id/imgIcon"
-            android:layout_width="match_parent"
-            android:layout_height="290dp"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
+    <TextView
+        android:id="@+id/tvTemp"
+        android:layout_width="135dp"
+        android:layout_height="110dp"
+        android:layout_alignBottom="@+id/imgIcon"
+        android:gravity="center"
+        android:text="@string/temp"
+        android:textColor="@color/colorWhite"
+        android:textSize="45sp" />
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/llStatus"
+        android:layout_toEndOf="@+id/tvTemp"
+        android:text="@string/status"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="25sp" />
+
+    <LinearLayout
+        android:id="@+id/llStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/recyclerView"
+        android:layout_marginTop="13dp"
+        android:layout_toRightOf="@id/tvTemp"
+        android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/tvTemp"
-            android:layout_width="135dp"
-            android:layout_height="110dp"
-            android:layout_alignBottom="@+id/imgIcon"
-            android:gravity="center"
-            android:text="@string/temp"
-            android:textColor="@color/colorWhite"
-            android:textSize="45sp" />
-
-        <TextView
-            android:id="@+id/tvStatus"
-            android:layout_width="match_parent"
+            android:id="@+id/tvHumidity"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/llStatus"
-            android:layout_toEndOf="@+id/tvTemp"
-            android:text="@string/status"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_humidity"
+            android:text="@string/humidity"
             android:textAlignment="center"
             android:textColor="@color/colorWhite"
-            android:textSize="25sp" />
+            android:textSize="15sp" />
 
-        <LinearLayout
-            android:id="@+id/llStatus"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tvCloud"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/recyclerView"
-            android:layout_marginTop="13dp"
-            android:layout_toRightOf="@id/tvTemp"
-            android:orientation="horizontal">
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_cloud"
+            android:text="@string/cloud"
+            android:textAlignment="center"
+            android:textColor="@color/colorWhite"
+            android:textSize="15sp" />
 
-            <TextView
-                android:id="@+id/tvHumidity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:drawableTop="@drawable/ic_humidity"
-                android:text="@string/humidity"
-                android:textAlignment="center"
-                android:textColor="@color/colorWhite"
-                android:textSize="15sp" />
+        <TextView
+            android:id="@+id/tvWind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_wind"
+            android:text="@string/wind"
+            android:textAlignment="center"
+            android:textColor="@color/colorWhite"
+            android:textSize="15sp" />
+    </LinearLayout>
 
-            <TextView
-                android:id="@+id/tvCloud"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:drawableTop="@drawable/ic_cloud"
-                android:text="@string/cloud"
-                android:textAlignment="center"
-                android:textColor="@color/colorWhite"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/tvWind"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:drawableTop="@drawable/ic_wind"
-                android:text="@string/wind"
-                android:textAlignment="center"
-                android:textColor="@color/colorWhite"
-                android:textSize="15sp" />
-        </LinearLayout>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/tvTemp"
-            android:layout_marginTop="5dp" />
-    </RelativeLayout>
-</ScrollView>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tvTemp"
+        android:layout_marginTop="5dp" />
+</RelativeLayout>

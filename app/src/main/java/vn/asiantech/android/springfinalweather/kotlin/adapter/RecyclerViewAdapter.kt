@@ -28,7 +28,6 @@ class RecyclerViewAdapter(private val mListCityWeather: List<CityWeather>) : Rec
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private var mTvDate: TextView = itemView.findViewById(R.id.tvDate)
-        private var mTvDateStatus: TextView = itemView.findViewById(R.id.tvDateStatus)
         private var mImgIconDate: ImageView = itemView.findViewById(R.id.imgIconDate)
         private var mTvMaxTempList: TextView = itemView.findViewById(R.id.tvMaxTempList)
         private var mTvMinTempList: TextView = itemView.findViewById(R.id.tvMinTempList)
@@ -36,7 +35,6 @@ class RecyclerViewAdapter(private val mListCityWeather: List<CityWeather>) : Rec
         @SuppressLint("SetTextI18n")
         fun bind(cityWeather: CityWeather) {
             mTvDate.text = cityWeather.date
-            mTvDateStatus.text = cityWeather.description
             mTvMaxTempList.text = cityWeather.tempMin.toString() + "°C"
             mTvMinTempList.text = cityWeather.tempMax.toString() + "°C"
             val icon = cityWeather.icon
