@@ -14,6 +14,7 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
@@ -31,12 +32,13 @@ import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
 import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeather
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionAsyncListener
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionChangeListener
+import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnInsertDoneListener
 import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 
 
 class MainActivity : AppCompatActivity(),
         View.OnClickListener, OnCityCollectionAsyncListener, OnCityCollectionChangeListener,
-        DrawerLayout.DrawerListener, Callback<InformationWeather> {
+        DrawerLayout.DrawerListener, Callback<InformationWeather>, OnInsertDoneListener {
     private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var mImgMenuIcon: ImageView
     private lateinit var mTvTitle: TextView
@@ -60,19 +62,22 @@ class MainActivity : AppCompatActivity(),
         initViews()
         initListener()
         initData()
-        if (intent.getBooleanExtra(Constants.FINDLOCATION, false)) {
-            checkLocationPermission()
-        } else {
-            val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
-            editor.putBoolean(Constants.LOCATION_PERMISSION, false)
-            editor.apply()
-            initDataFromDatabase()
+        when {
+            intent.getBooleanExtra(Constants.FINDLOCATION, false) -> checkLocationPermission()
+            isHaveDataFromSearch() -> {
+                mIsAddNewCity = true
+                loadInformationWeather(mCityName)
+            }
+            else -> initDataFromDatabase()
         }
     }
 
     @SuppressLint("MissingPermission")
     private fun checkLocationPermission() {
         val granted = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
+        editor.putBoolean(Constants.LOCATION_PERMISSION, granted)
+        editor.apply()
         if (granted) {
             val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
@@ -85,7 +90,6 @@ class MainActivity : AppCompatActivity(),
                                 response.body()?.let {
                                     mIsAddNewCity = true
                                     saveNewCityCollection(it, Constants.USER_LOCATION)
-                                    initDataFromDatabase()
                                 }
                             } else {
                                 Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
@@ -98,14 +102,6 @@ class MainActivity : AppCompatActivity(),
                     })
         }
 
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (isHaveDataFromSearch()) {
-            mIsAddNewCity = true
-            loadInformationWeather(mCityName)
-        }
     }
 
     private fun initViews() {
@@ -232,6 +228,7 @@ class MainActivity : AppCompatActivity(),
             if (city.cityName == cityCollection.cityName) {
                 index = mListCityCollection.indexOf(city)
                 mFocusName = cityCollection.cityName
+                city.state = cityCollection.state
                 mViewPager.currentItem = index
                 break
             }
@@ -268,6 +265,8 @@ class MainActivity : AppCompatActivity(),
             }
         } else {
             mListCityCollection.clear()
+            reloadListCityCollection()
+            reloadViewPager()
             goTo(SearchActivity::class.java, false)
         }
     }
@@ -332,11 +331,15 @@ class MainActivity : AppCompatActivity(),
             editor.putString(Constants.NAME_LOCATION, cityCollection.cityName)
             editor.apply()
         }
-        weatherRepository.insert(cityCollection)
+        weatherRepository.insert(cityCollection, this)
+    }
+
+    override fun onInsertDone(cityCollection: CityCollection) {
         if (mIsAddNewCity) {
             mIsAddNewCity = false
             addNewCityCollection(cityCollection)
         }
+        initDataFromDatabase()
     }
 
     private fun isOnline(): Boolean {

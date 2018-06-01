@@ -31,7 +31,6 @@ class SettingActivity : AppCompatActivity(),
     private val mItemsUnitOfTemp = arrayOf("C degree", "F degree")
     private val mItemsUnitOfWindSpeed = arrayOf("km/h", "m/s")
     private var mGranted = false
-    private var mInteractive = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,9 +75,7 @@ class SettingActivity : AppCompatActivity(),
             R.id.imgIconBack -> {
                 val intent = Intent(this, MainActivity::class.java)
                 mGranted = mSharedPreferences.getBoolean(Constants.LOCATION_PERMISSION, false)
-                if (mInteractive > 1) {
-                    intent.putExtra(Constants.FINDLOCATION, mGranted)
-                }
+                intent.putExtra(Constants.FINDLOCATION, mGranted)
                 if (!mGranted) {
                     val weatherRepository = WeatherRepository(this)
                     weatherRepository.deleteLocation()
@@ -101,7 +98,6 @@ class SettingActivity : AppCompatActivity(),
     }
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-        mInteractive++
         if (isChecked && !mGranted) {
             ActivityCompat.requestPermissions(
                     this,
