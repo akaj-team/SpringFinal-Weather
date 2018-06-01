@@ -30,8 +30,6 @@ import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
     private var mSharedPreferences: SharedPreferences? = null
     private lateinit var mTvTemp: TextView
-    private lateinit var mTvSunrise: TextView
-    private lateinit var mTvSunset: TextView
     private lateinit var mImgIcon: ImageView
     private lateinit var mTvStatus: TextView
     private lateinit var mTvHumidity: TextView
@@ -52,8 +50,6 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
 
     private fun initViews(view: View) {
         mTvTemp = view.findViewById(R.id.tvTemp)
-        mTvSunrise = view.findViewById(R.id.tvSunrise)
-        mTvSunset = view.findViewById(R.id.tvSunset)
         mImgIcon = view.findViewById(R.id.imgIcon)
         mTvStatus = view.findViewById(R.id.tvStatus)
         mTvHumidity = view.findViewById(R.id.tvHumidity)
@@ -81,7 +77,7 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
             } else {
                 mTvTemp.text = getFahrenheitDegree(bundle.getFloat(Constants.TEMP)).toString() + "°F"
             }
-            mImgIcon.setImageResource(Image.getIcon(
+            mImgIcon.setImageResource(Image.getImage(
                     bundle.getString(Constants.ICON),
                     bundle.getInt(Constants.IS_DAY)
             ))

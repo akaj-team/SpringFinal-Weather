@@ -6,26 +6,28 @@
     <TextView
         android:id="@+id/tvDate"
         android:layout_width="150dp"
-        android:layout_height="50dp"
+        android:layout_height="40dp"
         android:layout_marginLeft="10dp"
         android:gravity="center"
         android:text="@string/date"
-        android:textSize="20sp" />
+        android:textColor="@color/colorWhite"
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/tvDateStatus"
         android:layout_width="150dp"
-        android:layout_height="50dp"
+        android:layout_height="40dp"
         android:layout_below="@+id/tvDate"
         android:layout_marginLeft="10dp"
         android:gravity="center"
         android:text="@string/date_status"
-        android:textSize="20sp" />
+        android:textColor="@color/colorWhite"
+        android:textSize="15sp" />
 
     <ImageView
         android:id="@+id/imgIconDate"
         android:layout_width="65dp"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@+id/tvDate"
         android:src="@drawable/img_date" />
@@ -38,7 +40,8 @@
         android:layout_marginTop="5dp"
         android:layout_toEndOf="@id/imgIconDate"
         android:text="@string/max_temp"
-        android:textSize="20sp" />
+        android:textColor="@color/colorWhite"
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/tvMinTempList"
@@ -46,14 +49,14 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/tvMaxTempList"
         android:layout_below="@+id/tvDate"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
         android:text="@string/min_temp"
-        android:textSize="20sp" />
+        android:textColor="@color/colorWhite"
+        android:textSize="15sp" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/tvDateStatus"
-        android:background="@color/colorGray"
-        />
+        android:background="@color/colorBlack" />
 </RelativeLayout>
