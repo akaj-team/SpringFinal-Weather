@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scrollbars="vertical">
@@ -8,99 +9,82 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <ImageView
+            android:id="@+id/imgIcon"
+            android:layout_width="match_parent"
+            android:layout_height="290dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
         <TextView
             android:id="@+id/tvTemp"
             android:layout_width="135dp"
             android:layout_height="110dp"
-            android:layout_alignParentStart="true"
+            android:layout_alignBottom="@+id/imgIcon"
             android:gravity="center"
             android:text="@string/temp"
-            android:textSize="35sp" />
-
-        <TextView
-            android:id="@+id/tvSunrise"
-            android:layout_width="80dp"
-            android:layout_height="50dp"
-            android:layout_toEndOf="@+id/tvTemp"
-            android:gravity="center"
-            android:text="@string/max_temp"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/tvSunset"
-            android:layout_width="80dp"
-            android:layout_height="50dp"
-            android:layout_alignBottom="@+id/tvTemp"
-            android:layout_toEndOf="@+id/tvTemp"
-            android:gravity="center"
-            android:text="@string/min_temp"
-            android:textSize="15sp" />
-
-        <ImageView
-            android:id="@+id/imgIcon"
-            android:layout_width="135dp"
-            android:layout_height="110dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignTop="@+id/tvTemp"
-            android:layout_marginRight="20dp"
-            android:src="@drawable/img_sun" />
+            android:textColor="@color/colorWhite"
+            android:textSize="45sp" />
 
         <TextView
             android:id="@+id/tvStatus"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/tvTemp"
-            android:layout_marginStart="30dp"
+            android:layout_above="@+id/llStatus"
+            android:layout_toEndOf="@+id/tvTemp"
             android:text="@string/status"
+            android:textAlignment="center"
+            android:textColor="@color/colorWhite"
             android:textSize="25sp" />
 
         <LinearLayout
             android:id="@+id/llStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tvStatus"
-            android:layout_marginTop="20dp"
-            android:baselineAligned="false"
+            android:layout_above="@+id/recyclerView"
+            android:layout_marginTop="13dp"
+            android:layout_toRightOf="@id/tvTemp"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/tvHumidity"
-                android:layout_width="38dp"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:drawableTop="@drawable/img_humidity"
+                android:drawableTop="@drawable/ic_humidity"
                 android:text="@string/humidity"
                 android:textAlignment="center"
-                android:textSize="20sp" />
+                android:textColor="@color/colorWhite"
+                android:textSize="15sp" />
 
             <TextView
                 android:id="@+id/tvCloud"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:drawableTop="@drawable/img_cloud"
+                android:drawableTop="@drawable/ic_cloud"
                 android:text="@string/cloud"
                 android:textAlignment="center"
-                android:textSize="20sp" />
+                android:textColor="@color/colorWhite"
+                android:textSize="15sp" />
 
             <TextView
                 android:id="@+id/tvWind"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:drawableTop="@drawable/img_wind"
+                android:drawableTop="@drawable/ic_wind"
                 android:text="@string/wind"
                 android:textAlignment="center"
-                android:textSize="20sp" />
+                android:textColor="@color/colorWhite"
+                android:textSize="15sp" />
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/llStatus"
-            android:layout_marginTop="5dp"
-            android:focusable="false" />
+            android:layout_below="@+id/tvTemp"
+            android:layout_marginTop="5dp" />
     </RelativeLayout>
 </ScrollView>

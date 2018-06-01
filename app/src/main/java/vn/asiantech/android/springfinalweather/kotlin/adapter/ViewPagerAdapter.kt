@@ -31,7 +31,7 @@ class ViewPagerAdapter(fm: FragmentManager, private var mListCityCollection: Mut
         bundle.putString(Constants.DATE, cityCollection.date)
         bundle.putString(Constants.COUNTRY_NAME, cityCollection.countryName)
         bundle.putFloat(Constants.TEMP, cityCollection.temp)
-        bundle.putFloat(Constants.APPTEMP, cityCollection.appTemp)
+        bundle.putFloat(Constants.APP_TEMP, cityCollection.appTemp)
         bundle.putInt(Constants.HUMIDITY, cityCollection.humidity)
         bundle.putFloat(Constants.WIND, cityCollection.wind)
         bundle.putInt(Constants.CLOUD, cityCollection.cloud)

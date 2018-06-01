@@ -13,7 +13,7 @@ class Constants {
         const val DATE = "date"
         const val COUNTRY_NAME = "country_name"
         const val TEMP = "temp"
-        const val APPTEMP = "app_temp"
+        const val APP_TEMP = "app_temp"
         const val HUMIDITY = "humidity"
         const val WIND = "wind"
         const val CLOUD = "cloud"
@@ -27,6 +27,8 @@ class Constants {
         const val KEY = "b314dbc7647740fbbfe45806183105"
         const val BASE_URL_WEATHER = "http://api.apixu.com/v1/"
         const val DAYS = 5
+
+        //const for icon weather
 
         //const for State of City Collection
         const val USER_LOCATION = true
