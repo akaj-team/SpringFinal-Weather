@@ -19,8 +19,7 @@
         android:layout_height="40dp"
         android:layout_gravity="center"
         android:layout_marginLeft="20dp"
-        android:layout_toRightOf="@+id/tvDate"
-        android:src="@drawable/img_date" />
+        android:layout_toRightOf="@+id/tvDate" />
 
     <TextView
         android:id="@+id/tvMaxTempList"
