@@ -1,17 +1,19 @@
 package vn.asiantech.android.springfinalweather.kotlin.activity
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
 import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
@@ -61,14 +63,16 @@ class MainActivity : AppCompatActivity(),
         if (intent.getBooleanExtra(Constants.FINDLOCATION, false)) {
             checkLocationPermission()
         } else {
+            val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
+            editor.putBoolean(Constants.LOCATION_PERMISSION, false)
+            editor.apply()
             initDataFromDatabase()
         }
     }
 
     @SuppressLint("MissingPermission")
     private fun checkLocationPermission() {
-        val sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE)
-        val granted = sharedPreferences.getBoolean(Constants.LOCATION_PERMISSION, false)
+        val granted = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         if (granted) {
             val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
@@ -93,6 +97,7 @@ class MainActivity : AppCompatActivity(),
                         }
                     })
         }
+
     }
 
     override fun onResume() {
