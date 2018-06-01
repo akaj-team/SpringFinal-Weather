@@ -3,6 +3,7 @@ package vn.asiantech.android.springfinalweather.kotlin.activity
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.v4.view.ViewPager
@@ -10,6 +11,7 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
@@ -22,19 +24,17 @@ import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.adapter.CityCollectionAdapter
 import vn.asiantech.android.springfinalweather.kotlin.adapter.ViewPagerAdapter
-import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiServices
+import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiCityService
 import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
 import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeather
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionAsyncListener
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionChangeListener
 import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 class MainActivity : AppCompatActivity(),
         View.OnClickListener, OnCityCollectionAsyncListener, OnCityCollectionChangeListener,
-        DrawerLayout.DrawerListener {
+        DrawerLayout.DrawerListener, Callback<InformationWeather> {
     private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var mImgMenuIcon: ImageView
     private lateinit var mTvTitle: TextView
@@ -48,23 +48,59 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mCityCollectionAdapter: CityCollectionAdapter
     private var mListCityCollection: MutableList<CityCollection> = mutableListOf()
     private var mFocusName: String = ""
-    private var isNewData = false
-    private var isAddLocation = false
+    private var mIsNewData = false
+    private var mIsAddNewCity = false
+    private var mLocation = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initViews()
         initListener()
+        initData()
+        if (intent.getBooleanExtra(Constants.FINDLOCATION, false)) {
+            checkLocationPermission()
+        } else {
+            initDataFromDatabase()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun checkLocationPermission() {
+        val sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE)
+        val granted = sharedPreferences.getBoolean(Constants.LOCATION_PERMISSION, false)
+        if (granted) {
+            val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            val apiServices = ApiCityService()
+            apiServices.getCityApi()
+                    .getCurrentWeather("${location.latitude},${location.longitude}")
+                    .enqueue(object : Callback<InformationWeather> {
+                        override fun onResponse(call: Call<InformationWeather>, response: Response<InformationWeather>) {
+                            if (response.isSuccessful) {
+                                response.body()?.let {
+                                    mIsAddNewCity = true
+                                    saveNewCityCollection(it, Constants.USER_LOCATION)
+                                    initDataFromDatabase()
+                                }
+                            } else {
+                                Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
+                            Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
+                        }
+                    })
+        }
     }
 
     override fun onResume() {
         super.onResume()
         if (isHaveDataFromSearch()) {
-            isAddLocation = true
+            mIsAddNewCity = true
             loadInformationWeather(mCityName)
         }
-        initData()
     }
 
     private fun initViews() {
@@ -88,10 +124,18 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun initData() {
-        val weatherRepository = WeatherRepository(this)
-        weatherRepository.getAllCityCollection(this)
+        mCityCollectionAdapter = CityCollectionAdapter(mListCityCollection, this)
+        mRecyclerView.adapter = mCityCollectionAdapter
+        mRecyclerView.layoutManager = LinearLayoutManager(this)
         mViewPagerAdapter = ViewPagerAdapter(supportFragmentManager, mListCityCollection)
         mViewPager.adapter = mViewPagerAdapter
+    }
+
+    private fun initDataFromDatabase() {
+        val sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE)
+        mLocation = sharedPreferences.getString(Constants.NAME_LOCATION, "")
+        val weatherRepository = WeatherRepository(this)
+        weatherRepository.getAllCityCollection(this)
         mViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
             }
@@ -106,9 +150,8 @@ class MainActivity : AppCompatActivity(),
                 mTvDate.text = mListCityCollection[position].date
             }
         })
-        mCityCollectionAdapter = CityCollectionAdapter(mListCityCollection, this)
-        mRecyclerView.adapter = mCityCollectionAdapter
-        mRecyclerView.layoutManager = LinearLayoutManager(this)
+        reloadListCityCollection()
+        reloadViewPager()
     }
 
     private fun initListener() {
@@ -126,16 +169,19 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    private fun goTo(markClass: Class<*>) {
+    private fun goTo(markClass: Class<*>, canBack: Boolean = true) {
         intent = Intent(this, markClass)
+        intent.putExtra(Constants.CANBACK, canBack)
         startActivity(intent)
     }
 
     private fun isHaveDataFromSearch(): Boolean {
         val bundle = intent.extras
         if (bundle != null) {
-            mCityName = bundle.getString(Constants.CITY_NAME)
-            return true
+            mCityName = bundle.getString(Constants.CITY_NAME, "")
+            if (mCityName.isNotEmpty()) {
+                return true
+            }
         }
         return false
     }
@@ -162,11 +208,15 @@ class MainActivity : AppCompatActivity(),
             mViewPager.currentItem = index
             mTvTitle.text = "$mFocusName - ${mListCityCollection[index].countryName}"
             mTvDate.text = mListCityCollection[index].date
+        } else {
+            goTo(SearchActivity::class.java, false)
         }
-        if (isOnline() && !isNewData) {
-            mListCityCollection.forEach { loadInformationWeather(it.cityName) }
-            isNewData = true
-            initData()
+        if (isOnline() && !mIsNewData) {
+            mListCityCollection.forEach {
+                loadInformationWeather(it.cityName)
+            }
+            mIsNewData = true
+            initDataFromDatabase()
         }
         reloadListCityCollection()
     }
@@ -192,8 +242,8 @@ class MainActivity : AppCompatActivity(),
 
     @SuppressLint("SetTextI18n")
     override fun onDeleteCityCollection(cityCollection: CityCollection) {
-//        val weatherRepository = WeatherRepository(this)
-//        weatherRepository.delete(cityCollection)
+        val weatherRepository = WeatherRepository(this)
+        weatherRepository.delete(cityCollection)
         if (mListCityCollection.size > 1) {
             if (cityCollection.cityName == mFocusName) {
                 mListCityCollection.remove(cityCollection)
@@ -213,7 +263,7 @@ class MainActivity : AppCompatActivity(),
             }
         } else {
             mListCityCollection.clear()
-            goTo(SearchActivity::class.java)
+            goTo(SearchActivity::class.java, false)
         }
     }
 
@@ -236,51 +286,52 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun loadInformationWeather(cityName: String) {
-        val apiServices = ApiServices()
-        apiServices.getIEventWeather().getInformationWeather(cityName, Constants.KEY).enqueue(object : Callback<InformationWeather> {
-            override fun onResponse(call: Call<InformationWeather>, response: Response<InformationWeather>) {
-                if (response.isSuccessful) {
-                    response.body()?.let {
-                        saveNewCityCollection(it)
-                    }
-                } else {
-                    Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
-                Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
-            }
-        })
+        val apiServices = ApiCityService()
+        apiServices.getCityApi().getCurrentWeather(cityName).enqueue(this)
     }
 
-    private fun saveNewCityCollection(informationWeather: InformationWeather) {
-        val weatherRepository = WeatherRepository(applicationContext)
-        val cityCollection = CityCollection()
-        cityCollection.cityName = informationWeather.data[0].cityName
-        cityCollection.countryName = informationWeather.data[0].countryCode
-        cityCollection.temp = informationWeather.data[0].temp
-        cityCollection.appTemp = informationWeather.data[0].appTemp
-        cityCollection.sunrise = informationWeather.data[0].sunrise
-        cityCollection.sunset = informationWeather.data[0].sunset
-        cityCollection.humidity = informationWeather.data[0].humidity
-        cityCollection.wind = informationWeather.data[0].windSpeed
-        cityCollection.cloud = informationWeather.data[0].clouds
-        cityCollection.description = informationWeather.data[0].weather.description
-        cityCollection.icon = informationWeather.data[0].weather.icon
-        cityCollection.date = formatDate(informationWeather.data[0].timeStamp)
-        weatherRepository.insert(cityCollection)
-        if (isAddLocation) {
-            isAddLocation = false
-            addNewCityCollection(cityCollection)
+    override fun onResponse(call: Call<InformationWeather>, response: Response<InformationWeather>) {
+        if (response.isSuccessful) {
+            response.body()?.let {
+                saveNewCityCollection(it)
+            }
+        } else {
+            Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
-    private fun formatDate(timeStamp: Int): String {
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
-        val date = Date(timeStamp * 1000L)
-        return simpleDateFormat.format(date)
+    override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
+        Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun saveNewCityCollection(informationWeather: InformationWeather, state: Boolean = Constants.OTHER_LOCATION) {
+        val weatherRepository = WeatherRepository(applicationContext)
+        val cityCollection = CityCollection()
+        cityCollection.cityName = informationWeather.location.name
+        cityCollection.countryName = informationWeather.location.country
+        cityCollection.temp = informationWeather.current.temp
+        cityCollection.appTemp = informationWeather.current.appTemp
+        cityCollection.humidity = informationWeather.current.humidity
+        cityCollection.wind = informationWeather.current.windSpeed
+        cityCollection.cloud = informationWeather.current.cloud
+        cityCollection.description = informationWeather.current.condition.description
+        cityCollection.icon = informationWeather.current.condition.icon
+        cityCollection.date = informationWeather.current.date
+        cityCollection.day = informationWeather.current.isDay
+        if (mLocation == cityCollection.cityName) {
+            cityCollection.state = true
+        }
+        if (state) {
+            cityCollection.state = true
+            val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
+            editor.putString(Constants.NAME_LOCATION, cityCollection.cityName)
+            editor.apply()
+        }
+        weatherRepository.insert(cityCollection)
+        if (mIsAddNewCity) {
+            mIsAddNewCity = false
+            addNewCityCollection(cityCollection)
+        }
     }
 
     private fun isOnline(): Boolean {

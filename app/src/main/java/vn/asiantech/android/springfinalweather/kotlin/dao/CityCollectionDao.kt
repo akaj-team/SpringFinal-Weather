@@ -14,6 +14,9 @@ interface CityCollectionDao {
     @Delete
     fun delete(cityCollection: CityCollection)
 
+    @Query("DELETE FROM CityCollection WHERE state = :state")
+    fun deleteLocation(state: Boolean = true)
+
     @Query("SELECT * FROM CityCollection order by state DESC")
     fun getAllCityCollection(): List<CityCollection>
 }

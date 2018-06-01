@@ -2,6 +2,7 @@ package vn.asiantech.android.springfinalweather.kotlin.adapter
 
 import android.annotation.SuppressLint
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,16 +42,17 @@ class CityCollectionAdapter(
 
         @SuppressLint("SetTextI18n", "ResourceAsColor")
         fun bind(cityCollection: CityCollection, focusName: String) {
-            mTvCityName.text = cityCollection.cityName + "/" + cityCollection.countryName
+            mTvCityName.text = cityCollection.cityName
             if (cityCollection.state == Constants.USER_LOCATION) {
                 mImgIcon.setImageResource(R.drawable.ic_location_purple_24dp)
             } else {
                 mImgIcon.setImageResource(R.drawable.ic_cancel_black_24dp)
-                mImgIcon.setOnClickListener {
+            }
+            mImgIcon.setOnClickListener {
+                if (!cityCollection.state) {
                     listener.onDeleteCityCollection(cityCollection)
                 }
             }
-
             mTvCityName.setOnClickListener {
                 listener.onChangeShowCityCollection(cityCollection)
                 itemView.requestFocus()

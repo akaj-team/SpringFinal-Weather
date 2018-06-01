@@ -1,21 +1,28 @@
 package vn.asiantech.android.springfinalweather.kotlin.model
 
 import com.google.gson.annotations.SerializedName
+import java.util.concurrent.locks.Condition
 
-class InformationWeather(val data: List<Detail>)
+class InformationWeather(
+        @SerializedName("location") val location: LocationWeather,
+        @SerializedName("current") val current: CurrentWeather)
+class LocationWeather(
+        @SerializedName("name") val name: String,
+        @SerializedName("country") val country: String
+)
 
-class Detail(val pod: String,
-                  @SerializedName("country_code") val countryCode: String,
-                  val clouds: Int,
-                  @SerializedName("ts") val timeStamp: Int,
-                  @SerializedName("wind_spd") val windSpeed: Float,
-                  @SerializedName("city_name") val cityName: String,
-                  @SerializedName("rh") val humidity: Int,
-                  val weather: WeatherBean,
-                  val temp: Float,
-                  val sunset: String,
-                  val sunrise: String,
-                  @SerializedName("app_temp") val appTemp: Float)
+class CurrentWeather(
+        @SerializedName("is_day") val isDay: Int,
+        @SerializedName("cloud") val cloud: Int,
+        @SerializedName("last_updated") val date: String,
+        @SerializedName("wind_kph") val windSpeed: Float,
+        @SerializedName("humidity") val humidity: Int,
+        @SerializedName("condition") val condition: ConditionWeather,
+        @SerializedName("temp_c") val temp: Float,
+        @SerializedName("feelslike_c") val appTemp: Float
+)
 
-class WeatherBean(val icon: String,
-                       val description: String)
+class ConditionWeather(
+        @SerializedName("text") val description: String,
+        @SerializedName("code") val icon: String
+)

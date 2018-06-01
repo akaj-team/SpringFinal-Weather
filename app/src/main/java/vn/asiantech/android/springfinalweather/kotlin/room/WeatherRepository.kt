@@ -33,6 +33,10 @@ class WeatherRepository(context: Context) {
         DeleteCityCollectionAsyncTask(mCityCollectionDao, mCityWeatherDao).execute(cityCollection)
     }
 
+    fun deleteLocation() {
+        DeleteUserLocationAsyncTask(mCityCollectionDao).execute()
+    }
+
     fun getCityWeatherBy(cityName: String, listener: OnCityWeatherAsyncListener) {
         GetAllCityWeatherAsyncTask(mCityWeatherDao, listener, cityName).execute()
     }

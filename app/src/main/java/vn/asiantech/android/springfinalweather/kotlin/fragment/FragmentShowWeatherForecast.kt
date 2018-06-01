@@ -21,7 +21,7 @@ import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Image
 import vn.asiantech.android.springfinalweather.kotlin.adapter.RecyclerViewAdapter
-import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiServicesRecyclerView
+import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiCityService
 import vn.asiantech.android.springfinalweather.kotlin.model.CityWeather
 import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeatherRecyclerView
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityWeatherAsyncListener
@@ -70,9 +70,9 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
                     getString(R.string.shared_preference_name),
                     Context.MODE_PRIVATE)
             if (mSharedPreferences?.getInt(Constants.UNIT_OF_WIND_SPEED, 0) == 0) {
-                mTvWind.text = getKilometer(bundle.getFloat(Constants.WIND)).toString() + " km/h"
+                mTvWind.text = bundle.getFloat(Constants.WIND).toString() + " km/h"
             } else {
-                mTvWind.text = bundle.getFloat(Constants.WIND).toString() + " m/s"
+                mTvWind.text = getMetrePerSecond(bundle.getFloat(Constants.WIND)).toString() + " m/s"
             }
 
             if (mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0) == 0) {
@@ -81,9 +81,10 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
             } else {
                 mTvTemp.text = getFahrenheitDegree(bundle.getFloat(Constants.TEMP)).toString() + "°F"
             }
-            mTvSunrise.text = bundle.getString(Constants.SUNRISE)
-            mTvSunset.text = bundle.getString(Constants.SUNSET)
-            mImgIcon.setImageResource(Image.getIcon(bundle.getString(Constants.ICON)))
+            mImgIcon.setImageResource(Image.getIcon(
+                    bundle.getString(Constants.ICON),
+                    bundle.getInt(Constants.IS_DAY)
+            ))
             mTvStatus.text = bundle.getString(Constants.DESCRIPTION)
             mTvHumidity.text = bundle.getInt(Constants.HUMIDITY).toString() + "%"
             mTvCloud.text = bundle.getInt(Constants.CLOUD).toString() + "%"
@@ -113,8 +114,8 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
     }
 
     private fun loadListWeatherFourDay(cityName: String) {
-        val apiServicesRecyclerView = ApiServicesRecyclerView()
-        apiServicesRecyclerView.getIEventWeatherRecyclerView().getInformationWeatherRecyclerView(cityName, Constants.DAYS, Constants.KEY).enqueue(object : Callback<InformationWeatherRecyclerView> {
+        val apiServicesRecyclerView = ApiCityService()
+        apiServicesRecyclerView.getCityApi().getFiveDayWeather(cityName).enqueue(object : Callback<InformationWeatherRecyclerView> {
             override fun onResponse(call: Call<InformationWeatherRecyclerView>?, response: Response<InformationWeatherRecyclerView>) {
                 if (response.isSuccessful) {
                     response.body()?.let { saveNewCityWeather(it) }
@@ -130,32 +131,30 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
     private fun saveNewCityWeather(informationWeatherRecyclerView: InformationWeatherRecyclerView) {
         val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
         weatherRepository?.deleteBy(mCityName)
-        informationWeatherRecyclerView.data.forEach {
-            if (informationWeatherRecyclerView.data.indexOf(it) != 0) {
+        informationWeatherRecyclerView.forecast.forecastDay.forEach {
+            if (informationWeatherRecyclerView.forecast.forecastDay.indexOf(it) != 0) {
                 val cityWeather = CityWeather()
                 cityWeather.cityName = mCityName
-                cityWeather.date = it.datetime
-                cityWeather.description = it.weather.description
-                cityWeather.tempMax = it.maxTemp
-                cityWeather.tempMin = it.minTemp
-                cityWeather.icon = it.weather.icon
+                cityWeather.date = it.date
+                cityWeather.description = it.day.condition.description
+                cityWeather.tempMax = it.day.maxTemp
+                cityWeather.tempMin = it.day.minTemp
+                cityWeather.icon = it.day.condition.icon
                 weatherRepository?.insert(cityWeather)
             }
         }
         weatherRepository?.getCityWeatherBy(mCityName, this)
     }
 
-    private fun getKilometer(speed: Float): Float {
-        val convert = 3.6
-        val kilometer = speed.times(convert)
-        val result = Math.round(kilometer.toFloat().times(10)) / 10.0
+    private fun getMetrePerSecond(speed: Float): Float {
+        val metre = speed * 5 / 18
+        val result = Math.round(metre.times(10)) / 10.0
         return result.toFloat()
     }
 
     private fun getFahrenheitDegree(fah: Float): Float {
-        val convert = 33.8
-        val fahrenheit = fah.times(convert)
-        val result = Math.round(fahrenheit.toFloat().times(10)) / 10.0
+        val fahrenheit = fah.times(9).div(5) + 32
+        val result = Math.round(fahrenheit.times(10)) / 10.0
         return result.toFloat()
     }
 

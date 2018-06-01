@@ -7,7 +7,7 @@ import vn.asiantech.android.springfinalweather.kotlin.myinterface.CityApi
 
 class ApiCityService {
     private var mRetrofit: Retrofit = Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL_API_GOOGLE)
+            .baseUrl(Constants.BASE_URL_WEATHER)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
