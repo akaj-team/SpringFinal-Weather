@@ -227,5 +227,117 @@ class Image {
                 else -> return R.drawable.img_na
             }
         }
+
+        fun getBackground(icon: String, isDay: Int): Int {
+            return when (isDay) {
+                1 -> {
+                    when (icon) {
+                        Constants.CODE_1000 -> R.drawable.bg_113d
+                        Constants.CODE_1003 -> R.drawable.bg_116d
+                        Constants.CODE_1006 -> R.drawable.bg_116d
+                        Constants.CODE_1009 -> R.drawable.bg_122d
+                        Constants.CODE_1030 -> R.drawable.bg_143d
+                        Constants.CODE_1063 -> R.drawable.bg_176d
+                        Constants.CODE_1066 -> R.drawable.bg_179d
+                        Constants.CODE_1069 -> R.drawable.bg_182d
+                        Constants.CODE_1072 -> R.drawable.bg_185d
+                        Constants.CODE_1087 -> R.drawable.bg_200d
+                        Constants.CODE_1114 -> R.drawable.bg_227d
+                        Constants.CODE_1117 -> R.drawable.bg_230d
+                        Constants.CODE_1135 -> R.drawable.bg_248d
+                        Constants.CODE_1147 -> R.drawable.bg_260d
+                        Constants.CODE_1150 -> R.drawable.bg_263d
+                        Constants.CODE_1153 -> R.drawable.bg_266d
+                        Constants.CODE_1168 -> R.drawable.bg_281d
+                        Constants.CODE_1171 -> R.drawable.bg_284d
+                        Constants.CODE_1180 -> R.drawable.bg_293d
+                        Constants.CODE_1183 -> R.drawable.bg_296d
+                        Constants.CODE_1186 -> R.drawable.bg_299d
+                        Constants.CODE_1189 -> R.drawable.bg_302d
+                        Constants.CODE_1192 -> R.drawable.bg_305d
+                        Constants.CODE_1195 -> R.drawable.bg_308d
+                        Constants.CODE_1198 -> R.drawable.bg_311d
+                        Constants.CODE_1201 -> R.drawable.bg_314d
+                        Constants.CODE_1204 -> R.drawable.bg_317d
+                        Constants.CODE_1207 -> R.drawable.bg_320d
+                        Constants.CODE_1210 -> R.drawable.bg_323d
+                        Constants.CODE_1213 -> R.drawable.bg_326d
+                        Constants.CODE_1216 -> R.drawable.bg_329d
+                        Constants.CODE_1219 -> R.drawable.bg_332d
+                        Constants.CODE_1222 -> R.drawable.bg_335d
+                        Constants.CODE_1225 -> R.drawable.bg_338d
+                        Constants.CODE_1237 -> R.drawable.bg_350d
+                        Constants.CODE_1240 -> R.drawable.bg_353d
+                        Constants.CODE_1243 -> R.drawable.bg_356d
+                        Constants.CODE_1246 -> R.drawable.bg_359d
+                        Constants.CODE_1249 -> R.drawable.bg_362d
+                        Constants.CODE_1252 -> R.drawable.bg_365d
+                        Constants.CODE_1255 -> R.drawable.bg_368d
+                        Constants.CODE_1258 -> R.drawable.bg_371d
+                        Constants.CODE_1261 -> R.drawable.bg_374d
+                        Constants.CODE_1264 -> R.drawable.bg_377d
+                        Constants.CODE_1273 -> R.drawable.bg_386d
+                        Constants.CODE_1276 -> R.drawable.bg_389d
+                        Constants.CODE_1279 -> R.drawable.bg_392d
+                        Constants.CODE_1282 -> R.drawable.bg_395d
+                        else -> R.drawable.img_na
+                    }
+                }
+                0 -> {
+                    when (icon) {
+                        Constants.CODE_1000 -> R.drawable.bg_113
+                        Constants.CODE_1003 -> R.drawable.bg_116
+                        Constants.CODE_1006 -> R.drawable.bg_116
+                        Constants.CODE_1009 -> R.drawable.bg_122
+                        Constants.CODE_1030 -> R.drawable.bg_143
+                        Constants.CODE_1063 -> R.drawable.bg_176
+                        Constants.CODE_1066 -> R.drawable.bg_179
+                        Constants.CODE_1069 -> R.drawable.bg_182
+                        Constants.CODE_1072 -> R.drawable.bg_185
+                        Constants.CODE_1087 -> R.drawable.bg_200
+                        Constants.CODE_1114 -> R.drawable.bg_227
+                        Constants.CODE_1117 -> R.drawable.bg_230
+                        Constants.CODE_1135 -> R.drawable.bg_248
+                        Constants.CODE_1147 -> R.drawable.bg_260
+                        Constants.CODE_1150 -> R.drawable.bg_263
+                        Constants.CODE_1153 -> R.drawable.bg_266
+                        Constants.CODE_1168 -> R.drawable.bg_281
+                        Constants.CODE_1171 -> R.drawable.bg_284
+                        Constants.CODE_1180 -> R.drawable.bg_293
+                        Constants.CODE_1183 -> R.drawable.bg_296
+                        Constants.CODE_1186 -> R.drawable.bg_299
+                        Constants.CODE_1189 -> R.drawable.bg_302
+                        Constants.CODE_1192 -> R.drawable.bg_305
+                        Constants.CODE_1195 -> R.drawable.bg_308
+                        Constants.CODE_1198 -> R.drawable.bg_311
+                        Constants.CODE_1201 -> R.drawable.bg_314
+                        Constants.CODE_1204 -> R.drawable.bg_317
+                        Constants.CODE_1207 -> R.drawable.bg_320
+                        Constants.CODE_1210 -> R.drawable.bg_323
+                        Constants.CODE_1213 -> R.drawable.bg_326
+                        Constants.CODE_1216 -> R.drawable.bg_329
+                        Constants.CODE_1219 -> R.drawable.bg_332
+                        Constants.CODE_1222 -> R.drawable.bg_335
+                        Constants.CODE_1225 -> R.drawable.bg_338
+                        Constants.CODE_1237 -> R.drawable.bg_350
+                        Constants.CODE_1240 -> R.drawable.bg_353
+                        Constants.CODE_1243 -> R.drawable.bg_356
+                        Constants.CODE_1246 -> R.drawable.bg_359
+                        Constants.CODE_1249 -> R.drawable.bg_362
+                        Constants.CODE_1252 -> R.drawable.bg_365
+                        Constants.CODE_1255 -> R.drawable.bg_368
+                        Constants.CODE_1258 -> R.drawable.bg_371
+                        Constants.CODE_1261 -> R.drawable.bg_374
+                        Constants.CODE_1264 -> R.drawable.bg_377
+                        Constants.CODE_1273 -> R.drawable.bg_386
+                        Constants.CODE_1276 -> R.drawable.bg_389
+                        Constants.CODE_1279 -> R.drawable.bg_392
+                        Constants.CODE_1282 -> R.drawable.bg_395
+                        else -> R.drawable.img_na
+                    }
+                }
+                else -> return R.drawable.img_na
+            }
+        }
     }
 }
