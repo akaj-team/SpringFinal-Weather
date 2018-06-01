@@ -8,6 +8,7 @@ import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
 import vn.asiantech.android.springfinalweather.kotlin.model.CityWeather
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionAsyncListener
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityWeatherAsyncListener
+import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnInsertDoneListener
 
 class WeatherRepository(context: Context) {
     private lateinit var mCityWeatherDao: CityWeatherDao
@@ -25,8 +26,8 @@ class WeatherRepository(context: Context) {
         GetAllCityCollectionAsyncTask(mCityCollectionDao, listener).execute()
     }
 
-    fun insert(cityCollection: CityCollection) {
-        InsertCityCollectionAsyncTask(mCityCollectionDao).execute(cityCollection)
+    fun insert(cityCollection: CityCollection, listener: OnInsertDoneListener) {
+        InsertCityCollectionAsyncTask(mCityCollectionDao, listener).execute(cityCollection)
     }
 
     fun delete(cityCollection: CityCollection) {
