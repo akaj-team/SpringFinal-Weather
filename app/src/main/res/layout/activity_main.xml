@@ -4,7 +4,6 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorAccent"
     android:fitsSystemWindows="true"
     tools:context=".kotlin.activity.MainActivity">
 
@@ -17,13 +16,15 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolBar"
             android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize"
+            android:layout_height="wrap_content"
             android:background="@android:color/transparent">
 
             <ImageView
                 android:id="@+id/imgMenuIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
                 android:src="@drawable/ic_menu_white_24dp" />
 
             <LinearLayout
@@ -60,19 +61,26 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:id="@+id/lnDrawer"
-        android:layout_width="230dp"
+        android:id="@+id/rlDrawer"
+        android:layout_width="280dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@color/colorWhite"
-        android:padding="10dp">
+        android:background="@color/colorWhite">
+
+        <TextView
+            android:id="@+id/tvTitleDrawer"
+            style="@style/TextTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPurple"
+            android:text="@string/your_location" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerViewLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/vLine"
-            android:layout_alignParentTop="true" />
+            android:layout_below="@id/tvTitleDrawer" />
 
         <View
             android:id="@+id/vLine"
@@ -84,29 +92,31 @@
         <TextView
             android:id="@+id/tvAddLocation"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_above="@+id/tvSetting"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_tv_when_press"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_add_black_36dp"
+            android:drawablePadding="8dp"
             android:focusable="true"
-            android:gravity="center"
+            android:gravity="center_vertical"
             android:text="@string/add_location"
             android:textSize="18sp" />
 
         <TextView
             android:id="@+id/tvSetting"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_tv_when_press"
             android:clickable="true"
             android:drawableLeft="@drawable/ic_settings_black_36dp"
+            android:drawablePadding="8dp"
             android:focusable="true"
-            android:gravity="center"
+            android:gravity="center_vertical"
             android:text="@string/setting"
             android:textSize="18sp" />
     </RelativeLayout>

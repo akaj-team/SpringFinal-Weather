@@ -9,14 +9,18 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.view.View
+import android.view.WindowManager
 import android.widget.*
 import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
+import vn.asiantech.android.springfinalweather.kotlin.`object`.Dimen
 import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 
 class SettingActivity : AppCompatActivity(),
         View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+    private lateinit var mToolbar: Toolbar
     private lateinit var mImgBack: ImageView
     private lateinit var mSwitchAllowCurrentLocation: Switch
     private lateinit var mSharedPreferences: SharedPreferences
@@ -41,6 +45,10 @@ class SettingActivity : AppCompatActivity(),
     }
 
     private fun initViews() {
+        val w = window
+        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+        mToolbar = findViewById(R.id.toolBar)
+        mToolbar.setPadding(0, Dimen.getStatusBarHeight(this)*3/2, 0, Dimen.getStatusBarHeight(this)/2)
         mImgBack = findViewById(R.id.imgIconBack)
         mSwitchAllowCurrentLocation = findViewById(R.id.switchAllowCurrentLocation)
         mLlUnitOfTemp = findViewById(R.id.llUnitOfTemp)
@@ -95,6 +103,18 @@ class SettingActivity : AppCompatActivity(),
                     mTvUnitOfWindSpeed
             )
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent = Intent(this, MainActivity::class.java)
+        mGranted = mSharedPreferences.getBoolean(Constants.LOCATION_PERMISSION, false)
+        intent.putExtra(Constants.FINDLOCATION, mGranted)
+        if (!mGranted) {
+            val weatherRepository = WeatherRepository(this)
+            weatherRepository.deleteLocation()
+        }
+        startActivity(intent)
     }
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {

@@ -7,9 +7,11 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.WindowManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
@@ -18,6 +20,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
+import vn.asiantech.android.springfinalweather.kotlin.`object`.Dimen
 import vn.asiantech.android.springfinalweather.kotlin.adapter.CityPredictionAdapter
 import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiCityService
 import vn.asiantech.android.springfinalweather.kotlin.model.City
@@ -26,6 +29,7 @@ import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnSelectCityLi
 
 class SearchActivity : AppCompatActivity(),
         View.OnClickListener, TextWatcher, Callback<List<City>>, OnSelectCityListener {
+    private lateinit var mToolbar: Toolbar
     private lateinit var mImgBack: ImageView
     private lateinit var mEdtCityName: EditText
     private lateinit var mRecyclerView: RecyclerView
@@ -45,6 +49,10 @@ class SearchActivity : AppCompatActivity(),
     }
 
     private fun initViews() {
+        val w = window
+        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+        mToolbar = findViewById(R.id.toolBarSearch)
+        mToolbar.setPadding(0, Dimen.getStatusBarHeight(this)*3/2,0,Dimen.getStatusBarHeight(this)/2)
         mImgBack = findViewById(R.id.imgIconBack)
         mEdtCityName = findViewById(R.id.edtCityName)
         mRecyclerView = findViewById(R.id.recyclerViewResultLocation)

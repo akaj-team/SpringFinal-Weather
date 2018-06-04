@@ -12,7 +12,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import retrofit2.Call
@@ -38,7 +37,6 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
     private lateinit var mTvWind: TextView
     private lateinit var mRecyclerViewAdapter: RecyclerViewAdapter
     private lateinit var mRecyclerView: RecyclerView
-    private lateinit var mRl: RelativeLayout
     private var mListCityWeather: MutableList<CityWeather> = mutableListOf()
     private lateinit var mCityName: String
     private var mIsNewData = false
@@ -58,7 +56,6 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
         mTvCloud = view.findViewById(R.id.tvCloud)
         mTvWind = view.findViewById(R.id.tvWind)
         mRecyclerView = view.findViewById(R.id.recyclerView)
-        mRl = view.findViewById(R.id.rlContent)
     }
 
     @SuppressLint("SetTextI18n")
@@ -73,14 +70,13 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
             } else {
                 mTvWind.text = getMetrePerSecond(bundle.getFloat(Constants.WIND)).toString() + " m/s"
             }
-
-            if (mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0) == 0) {
+            val unitOfTemp = mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0)
+            if (unitOfTemp == 0) {
                 mTvTemp.text = bundle.getFloat(Constants.TEMP).toString() + "°C"
 
             } else {
                 mTvTemp.text = getFahrenheitDegree(bundle.getFloat(Constants.TEMP)).toString() + "°F"
             }
-            mRl.setBackgroundResource(Image.getBackground(bundle.getString(Constants.ICON), bundle.getInt(Constants.IS_DAY)))
             mImgIcon.setImageResource(Image.getImage(
                     bundle.getString(Constants.ICON),
                     bundle.getInt(Constants.IS_DAY)
@@ -91,7 +87,7 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
             mCityName = bundle.getString(Constants.CITY_NAME)
             val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
             weatherRepository?.getCityWeatherBy(mCityName, this)
-            mRecyclerViewAdapter = RecyclerViewAdapter(mListCityWeather)
+            mRecyclerViewAdapter = RecyclerViewAdapter(mListCityWeather, unitOfTemp)
             mRecyclerView.adapter = mRecyclerViewAdapter
             mRecyclerView.layoutManager = LinearLayoutManager(activity)
         }
