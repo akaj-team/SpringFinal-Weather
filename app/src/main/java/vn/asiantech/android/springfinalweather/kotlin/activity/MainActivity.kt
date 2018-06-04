@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity(),
         mImgMenuIcon = findViewById(R.id.imgMenuIcon)
         mTvTitle = findViewById(R.id.tvTitle)
         mTvTitleDrawer = findViewById(R.id.tvTitleDrawer)
-        mTvTitleDrawer.setPadding(50, Dimen.getStatusBarHeight(this), 0, Dimen.getStatusBarHeight(this)/2)
+        mTvTitleDrawer.setPadding(50, Dimen.getStatusBarHeight(this), 0, Dimen.getStatusBarHeight(this) / 2)
         mTvDate = findViewById(R.id.tvDate)
         mTvSetting = findViewById(R.id.tvSetting)
         mRlDrawer = findViewById(R.id.rlDrawer)

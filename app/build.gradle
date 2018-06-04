@@ -49,6 +49,8 @@ dependencies {
     //    room database
     implementation "android.arch.persistence.room:runtime:$roomVersion"
     kapt "android.arch.persistence.room:compiler:$roomVersion"
+    //  linechart
+    implementation 'com.diogobernardino:williamchart:2.5.0'
 }
 
 apply from: "../ci-java.gradle"
