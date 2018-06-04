@@ -1,11 +1,11 @@
 package vn.asiantech.android.springfinalweather.kotlin.model
 
 import com.google.gson.annotations.SerializedName
-import java.util.concurrent.locks.Condition
 
 class InformationWeather(
         @SerializedName("location") val location: LocationWeather,
         @SerializedName("current") val current: CurrentWeather)
+
 class LocationWeather(
         @SerializedName("name") val name: String,
         @SerializedName("country") val country: String

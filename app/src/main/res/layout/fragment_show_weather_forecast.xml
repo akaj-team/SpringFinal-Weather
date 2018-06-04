@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rlContent"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -78,7 +77,16 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/tvTemp"
         android:layout_marginTop="5dp" />
+
+    <com.db.chart.view.LineChartView
+        android:layout_marginTop="10dp"
+        android:id="@+id/lineChartView"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_below="@+id/recyclerView">
+
+    </com.db.chart.view.LineChartView>
 </RelativeLayout>

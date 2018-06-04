@@ -3,7 +3,9 @@ package vn.asiantech.android.springfinalweather.kotlin.fragment
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.net.ConnectivityManager
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -12,9 +14,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import com.db.chart.model.LineSet
+import com.db.chart.model.Point
+import com.db.chart.view.LineChartView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,11 +28,13 @@ import vn.asiantech.android.springfinalweather.kotlin.`object`.Image
 import vn.asiantech.android.springfinalweather.kotlin.adapter.RecyclerViewAdapter
 import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiCityService
 import vn.asiantech.android.springfinalweather.kotlin.model.CityWeather
+import vn.asiantech.android.springfinalweather.kotlin.model.HistoryInformationWeather
 import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeatherRecyclerView
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityWeatherAsyncListener
 import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 
 class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
+
     private var mSharedPreferences: SharedPreferences? = null
     private lateinit var mTvTemp: TextView
     private lateinit var mImgIcon: ImageView
@@ -38,9 +44,10 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
     private lateinit var mTvWind: TextView
     private lateinit var mRecyclerViewAdapter: RecyclerViewAdapter
     private lateinit var mRecyclerView: RecyclerView
-    private lateinit var mRl: RelativeLayout
+    private lateinit var mLineChartView: LineChartView
     private var mListCityWeather: MutableList<CityWeather> = mutableListOf()
     private lateinit var mCityName: String
+    private lateinit var mDate: String
     private var mIsNewData = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -58,7 +65,7 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
         mTvCloud = view.findViewById(R.id.tvCloud)
         mTvWind = view.findViewById(R.id.tvWind)
         mRecyclerView = view.findViewById(R.id.recyclerView)
-        mRl = view.findViewById(R.id.rlContent)
+        mLineChartView = view.findViewById(R.id.lineChartView)
     }
 
     @SuppressLint("SetTextI18n")
@@ -80,7 +87,6 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
             } else {
                 mTvTemp.text = getFahrenheitDegree(bundle.getFloat(Constants.TEMP)).toString() + "°F"
             }
-            mRl.setBackgroundResource(Image.getBackground(bundle.getString(Constants.ICON), bundle.getInt(Constants.IS_DAY)))
             mImgIcon.setImageResource(Image.getImage(
                     bundle.getString(Constants.ICON),
                     bundle.getInt(Constants.IS_DAY)
@@ -141,6 +147,9 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
                 cityWeather.tempMin = it.day.minTemp
                 cityWeather.icon = it.day.condition.icon
                 weatherRepository?.insert(cityWeather)
+            } else {
+                mDate = it.date
+                setLineChartTemp(mCityName)
             }
         }
         weatherRepository?.getCityWeatherBy(mCityName, this)
@@ -162,5 +171,31 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
         val cm = activity?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
         val netInfo = cm?.activeNetworkInfo
         return netInfo != null && netInfo.isConnected
+    }
+
+    private fun setLineChartTemp(cityName: String) {
+        val apiServicesHistoryInformationWeather = ApiCityService()
+        apiServicesHistoryInformationWeather.getCityApi().getHistoryWeather(cityName, mDate).enqueue(object : Callback<HistoryInformationWeather> {
+            override fun onResponse(call: Call<HistoryInformationWeather>?, response: Response<HistoryInformationWeather>) {
+                if (response.isSuccessful) {
+                    val dataSet = LineSet()
+                    response.body()?.forecast?.forecastDay?.get(0)?.hour?.forEach {
+                        dataSet.addPoint(Point(it.time.split(" ")[1].split(":")[0], it.tempC))
+                    }
+                    dataSet.color = Color.WHITE
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        activity?.resources?.getColor(R.color.colorPurplePastel, context?.theme)?.let { dataSet.setFill(it) }
+                        activity?.resources?.getColor(R.color.colorWhite, context?.theme)?.let { mLineChartView.setLabelsColor(it) }
+                    }
+                    dataSet.thickness = 1f
+                    mLineChartView.addData(dataSet)
+                    mLineChartView.show()
+                }
+            }
+
+            override fun onFailure(call: Call<HistoryInformationWeather>?, t: Throwable?) {
+                Toast.makeText(context, R.string.notification, Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 }
