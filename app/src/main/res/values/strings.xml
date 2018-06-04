@@ -30,4 +30,5 @@
     <string name="city_not_found">Sorry, but we can\'t found data of this city</string>
     <string name="get_my_location">Get Your Location</string>
     <string name="sun_status">53%</string>
+    <string name="your_location">Your City</string>
 </resources>
