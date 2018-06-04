@@ -80,8 +80,8 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
             } else {
                 mTvWind.text = getMetrePerSecond(bundle.getFloat(Constants.WIND)).toString() + " m/s"
             }
-
-            if (mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0) == 0) {
+            val unitOfTemp = mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0)
+            if (unitOfTemp == 0) {
                 mTvTemp.text = bundle.getFloat(Constants.TEMP).toString() + "°C"
 
             } else {
@@ -97,7 +97,7 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
             mCityName = bundle.getString(Constants.CITY_NAME)
             val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
             weatherRepository?.getCityWeatherBy(mCityName, this)
-            mRecyclerViewAdapter = RecyclerViewAdapter(mListCityWeather)
+            mRecyclerViewAdapter = RecyclerViewAdapter(mListCityWeather, unitOfTemp)
             mRecyclerView.adapter = mRecyclerViewAdapter
             mRecyclerView.layoutManager = LinearLayoutManager(activity)
         }

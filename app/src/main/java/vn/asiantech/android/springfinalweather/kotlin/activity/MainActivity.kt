@@ -14,9 +14,12 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.view.Gravity
 import android.view.View
+import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import retrofit2.Call
@@ -24,6 +27,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
+import vn.asiantech.android.springfinalweather.kotlin.`object`.Dimen
+import vn.asiantech.android.springfinalweather.kotlin.`object`.Image
 import vn.asiantech.android.springfinalweather.kotlin.adapter.CityCollectionAdapter
 import vn.asiantech.android.springfinalweather.kotlin.adapter.ViewPagerAdapter
 import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiCityService
@@ -38,9 +43,12 @@ import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 class MainActivity : AppCompatActivity(),
         View.OnClickListener, OnCityCollectionAsyncListener, OnCityCollectionChangeListener,
         DrawerLayout.DrawerListener, Callback<InformationWeather>, OnInsertDoneListener {
+    private lateinit var mToolBar: Toolbar
+    private lateinit var mRlDrawer: RelativeLayout
     private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var mImgMenuIcon: ImageView
     private lateinit var mTvTitle: TextView
+    private lateinit var mTvTitleDrawer: TextView
     private lateinit var mTvDate: TextView
     private lateinit var mViewPager: ViewPager
     private lateinit var mViewPagerAdapter: ViewPagerAdapter
@@ -104,12 +112,20 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun initViews() {
+        val w = window
+        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+        mToolBar = findViewById(R.id.toolBar)
+        mToolBar.setPadding(0, Dimen.getStatusBarHeight(this), 0, Dimen.getStatusBarHeight(this))
         mViewPager = findViewById(R.id.viewPager)
         mDrawerLayout = findViewById(R.id.drawerLayout)
         mImgMenuIcon = findViewById(R.id.imgMenuIcon)
         mTvTitle = findViewById(R.id.tvTitle)
+        mTvTitleDrawer = findViewById(R.id.tvTitleDrawer)
+        mTvTitleDrawer.setPadding(50, Dimen.getStatusBarHeight(this), 0, Dimen.getStatusBarHeight(this) / 2)
         mTvDate = findViewById(R.id.tvDate)
         mTvSetting = findViewById(R.id.tvSetting)
+        mRlDrawer = findViewById(R.id.rlDrawer)
+        mRlDrawer.setPadding(0, 0, 0, Dimen.getNavigationBarHeight(this))
         mTvAddLocation = findViewById(R.id.tvAddLocation)
         mRecyclerView = findViewById(R.id.recyclerViewLocation)
     }
@@ -148,6 +164,10 @@ class MainActivity : AppCompatActivity(),
                 mFocusName = mListCityCollection[position].cityName
                 mTvTitle.text = "$mFocusName - ${mListCityCollection[position].countryName}"
                 mTvDate.text = mListCityCollection[position].date
+                mDrawerLayout.setBackgroundResource(Image.getBackground(
+                        mListCityCollection[position].icon,
+                        mListCityCollection[position].day
+                ))
             }
         })
         reloadListCityCollection()
@@ -208,6 +228,10 @@ class MainActivity : AppCompatActivity(),
             mViewPager.currentItem = index
             mTvTitle.text = "$mFocusName - ${mListCityCollection[index].countryName}"
             mTvDate.text = mListCityCollection[index].date
+            mDrawerLayout.setBackgroundResource(Image.getBackground(
+                    mListCityCollection[index].icon,
+                    mListCityCollection[index].day
+            ))
         } else {
             goTo(SearchActivity::class.java, false)
         }
@@ -253,6 +277,10 @@ class MainActivity : AppCompatActivity(),
                 mFocusName = mListCityCollection[0].cityName
                 mTvTitle.text = "$mFocusName - ${mListCityCollection[0].countryName}"
                 mTvDate.text = mListCityCollection[0].date
+                mDrawerLayout.setBackgroundResource(Image.getBackground(
+                        mListCityCollection[0].icon,
+                        mListCityCollection[0].day
+                ))
                 reloadListCityCollection()
             } else {
                 if (mViewPager.currentItem > mListCityCollection.indexOf(cityCollection)) {

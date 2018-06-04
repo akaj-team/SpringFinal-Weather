@@ -10,25 +10,35 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolBar"
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="@color/colorPurple"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/imgIconBack"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginRight="30dp"
-            android:src="@drawable/ic_arrow_back_white_24dp" />
-
-        <TextView
-            android:id="@+id/tvTitle"
-            style="@style/TextTitle"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/setting" />
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:id="@+id/imgIconBack"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginRight="30dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:src="@drawable/ic_arrow_back_white_24dp" />
+
+            <TextView
+                android:id="@+id/tvTitle"
+                style="@style/TextTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/setting" />
+        </LinearLayout>
     </android.support.v7.widget.Toolbar>
 
     <TextView
@@ -100,7 +110,6 @@
             android:id="@+id/tvUnitOfTemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/temp"
             android:textColor="@color/colorPurplePastel" />
     </LinearLayout>
 
@@ -127,7 +136,6 @@
             android:id="@+id/tvUnitOfWindSpeed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/wind"
             android:textColor="@color/colorPurplePastel" />
     </LinearLayout>
 
