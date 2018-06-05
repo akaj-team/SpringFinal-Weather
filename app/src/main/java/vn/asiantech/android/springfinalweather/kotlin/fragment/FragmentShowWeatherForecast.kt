@@ -11,13 +11,11 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import com.db.chart.model.LineSet
 import com.db.chart.model.Point
 import com.db.chart.view.LineChartView
@@ -56,7 +54,7 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
     private lateinit var mDate: String
     private lateinit var mSecondDate: String
     private var mIsNewData = false
-    private var mIsNewHistoryData = false
+    private var mCount = 0
     private lateinit var mDialogLoading: Dialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -111,13 +109,13 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
             mSecondDate = mDate.split(" ")[0]
             mDialogLoading.show()
             val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
-            weatherRepository?.getCityWeatherBy(mCityName, this)
-            weatherRepository?.getCityHistoryWeatherBy(mCityName, this)
             if (isOnline() && !mIsNewData) {
                 mIsNewData = true
                 loadListWeatherFourDay(mCityName)
+                loadLineChartTemp(mCityName)
             } else {
                 weatherRepository?.getCityWeatherBy(mCityName, this)
+                weatherRepository?.getCityHistoryWeatherBy(mCityName, this)
             }
             mRecyclerViewAdapter = RecyclerViewAdapter(mListCityWeather, unitOfTemp)
             mRecyclerView.adapter = mRecyclerViewAdapter
@@ -130,12 +128,13 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
     }
 
     override fun onLoadCityWeatherList(listCityWeather: List<CityWeather>) {
-        mDialogLoading.dismiss()
         mListCityWeather.clear()
         listCityWeather.forEach {
             mListCityWeather.add(it)
         }
         reloadRecyclerView()
+        mCount++
+        countDialog()
     }
 
     override fun onLoadCityHistoryWeatherList(listCityHistoryWeather: List<CityHistoryWeather>) {
@@ -143,7 +142,6 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
         listCityHistoryWeather.forEach {
             dataSet.addPoint(Point(it.time.split(" ")[1].split(":")[0], it.tempC))
         }
-        Log.d("zxc", "" + listCityHistoryWeather.size)
         dataSet.color = Color.WHITE
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             activity?.resources?.getColor(R.color.colorGray, context?.theme)?.let { dataSet.setFill(it) }
@@ -154,10 +152,8 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
             mLineChartView.addData(dataSet)
             mLineChartView.show()
         }
-        if (isOnline() && !mIsNewHistoryData) {
-            mIsNewHistoryData = true
-            loadLineChartTemp(mCityName)
-        }
+        mCount++
+        countDialog()
     }
 
     private fun loadListWeatherFourDay(cityName: String) {
@@ -187,7 +183,7 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
             }
 
             override fun onFailure(call: Call<HistoryInformationWeather>?, t: Throwable?) {
-                Toast.makeText(context, R.string.notification, Toast.LENGTH_SHORT).show()
+                mDialogLoading.dismiss()
             }
         })
     }
@@ -246,6 +242,13 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
         val cm = activity?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
         val netInfo = cm?.activeNetworkInfo
         return netInfo != null && netInfo.isConnected
+    }
+
+    private fun countDialog() {
+        if (mCount == 2) {
+            mDialogLoading.dismiss()
+            mCount = 0
+        }
     }
 
     override fun onDestroyView() {
