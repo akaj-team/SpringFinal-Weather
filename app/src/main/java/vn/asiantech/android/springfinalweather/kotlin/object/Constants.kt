@@ -24,7 +24,7 @@ class Constants {
         const val FINDLOCATION = "find_location"
 
         //const for Api
-        const val KEY = "0a842a2a89fa4aabb0570503183105"
+        const val KEY = "cdcbdbadb16f40f1bb034116180506"
         const val BASE_URL_WEATHER = "http://api.apixu.com/v1/"
         const val DAYS = 5
 

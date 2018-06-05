@@ -10,11 +10,16 @@ class GetAllCityWeatherAsyncTask(
         private var listener: OnCityWeatherAsyncListener,
         private var cityName: String
 ) : AsyncTask<Unit, Unit, List<CityWeather>>() {
+    private var mCheck = false
+
     override fun doInBackground(vararg params: Unit?): List<CityWeather> {
+        mCheck = true
         return cityWeatherDao.getCityWeatherBy(cityName)
     }
 
     override fun onPostExecute(result: List<CityWeather>) {
-        listener.onLoadCityWeatherList(result)
+        if (mCheck) {
+            listener.onLoadCityWeatherList(result)
+        }
     }
 }
