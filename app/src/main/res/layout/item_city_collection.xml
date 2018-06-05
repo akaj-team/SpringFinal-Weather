@@ -23,6 +23,6 @@
         android:layout_width="50dp"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
-        android:padding="18dp"
+        android:padding="14dp"
         android:src="@drawable/ic_cancel_black_24dp" />
 </RelativeLayout>

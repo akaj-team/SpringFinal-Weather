@@ -76,6 +76,7 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
         mDialogLoading = Dialog(activity, R.style.Dialog)
         mDialogLoading.setContentView(R.layout.dialog_waiting)
         mDialogLoading.setCanceledOnTouchOutside(false)
+        mDialogLoading.setCancelable(true)
     }
 
     @SuppressLint("SetTextI18n")

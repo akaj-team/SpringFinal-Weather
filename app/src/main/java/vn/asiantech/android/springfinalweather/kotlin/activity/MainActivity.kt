@@ -72,10 +72,22 @@ class MainActivity : AppCompatActivity(),
         initListener()
         initData()
         when {
-            intent.getBooleanExtra(Constants.FINDLOCATION, false) -> checkLocationPermission()
+            intent.getBooleanExtra(Constants.FINDLOCATION, false) -> {
+                if (isOnline()){
+                    checkLocationPermission()
+                } else {
+                    Toast.makeText(this, R.string.connect_fail, Toast.LENGTH_SHORT).show()
+                    initDataFromDatabase()
+                }
+            }
             isHaveDataFromSearch() -> {
-                mIsAddNewCity = true
-                loadInformationWeather(mCityName)
+                if (isOnline()) {
+                    mIsAddNewCity = true
+                    loadInformationWeather(mCityName)
+                } else {
+                    Toast.makeText(this, R.string.connect_fail, Toast.LENGTH_SHORT).show()
+                    initDataFromDatabase()
+                }
             }
             else -> initDataFromDatabase()
         }
@@ -113,7 +125,6 @@ class MainActivity : AppCompatActivity(),
                         }
                     })
         }
-
     }
 
     private fun initViews() {
@@ -136,6 +147,7 @@ class MainActivity : AppCompatActivity(),
         mDialogLoading = Dialog(this, R.style.Dialog)
         mDialogLoading.setContentView(R.layout.dialog_waiting)
         mDialogLoading.setCanceledOnTouchOutside(false)
+        mDialogLoading.setCancelable(false)
     }
 
     private fun reloadViewPager() {

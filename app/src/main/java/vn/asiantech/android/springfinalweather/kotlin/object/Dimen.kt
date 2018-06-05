@@ -30,5 +30,12 @@ class Dimen {
             val dateFormat = SimpleDateFormat("MM/dd/yyyy")
             return dateFormat.format(dateParse.parse(day))
         }
+
+        @SuppressLint("SimpleDateFormat")
+        fun getDateFormat(day: String): String {
+            val dateParse = SimpleDateFormat("yyyy-MM-dd")
+            val dateFormat = SimpleDateFormat("MM/dd/yyyy")
+            return dateFormat.format(dateParse.parse(day))
+        }
     }
 }

@@ -94,6 +94,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_above="@+id/tvSetting"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_tv_when_press"
             android:clickable="true"
@@ -102,7 +103,7 @@
             android:focusable="true"
             android:gravity="center_vertical"
             android:text="@string/add_location"
-            android:textSize="18sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tvSetting"
@@ -110,6 +111,7 @@
             android:layout_height="50dp"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="10dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_tv_when_press"
             android:clickable="true"
@@ -118,6 +120,6 @@
             android:focusable="true"
             android:gravity="center_vertical"
             android:text="@string/setting"
-            android:textSize="18sp" />
+            android:textSize="14sp" />
     </RelativeLayout>
 </android.support.v4.widget.DrawerLayout>
