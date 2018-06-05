@@ -28,8 +28,6 @@ class Constants {
         const val BASE_URL_WEATHER = "http://api.apixu.com/v1/"
         const val DAYS = 5
 
-        //const for icon weather
-
         //const for State of City Collection
         const val USER_LOCATION = true
         const val OTHER_LOCATION = false

@@ -2,6 +2,7 @@ package vn.asiantech.android.springfinalweather.kotlin.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -62,6 +63,7 @@ class MainActivity : AppCompatActivity(),
     private var mIsNewData = false
     private var mIsAddNewCity = false
     private var mLocation = ""
+    private lateinit var mDialogLoading: Dialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,6 +83,7 @@ class MainActivity : AppCompatActivity(),
 
     @SuppressLint("MissingPermission")
     private fun checkLocationPermission() {
+        mDialogLoading.show()
         val granted = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
         editor.putBoolean(Constants.LOCATION_PERMISSION, granted)
@@ -100,11 +103,13 @@ class MainActivity : AppCompatActivity(),
                                 }
                             } else {
                                 Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
+                                mDialogLoading.dismiss()
                             }
                         }
 
                         override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
                             Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
+                            mDialogLoading.dismiss()
                         }
                     })
         }
@@ -128,6 +133,9 @@ class MainActivity : AppCompatActivity(),
         mRlDrawer.setPadding(0, 0, 0, Dimen.getNavigationBarHeight(this))
         mTvAddLocation = findViewById(R.id.tvAddLocation)
         mRecyclerView = findViewById(R.id.recyclerViewLocation)
+        mDialogLoading = Dialog(this, R.style.Dialog)
+        mDialogLoading.setContentView(R.layout.dialog_waiting)
+        mDialogLoading.setCanceledOnTouchOutside(false)
     }
 
     private fun reloadViewPager() {
@@ -162,16 +170,14 @@ class MainActivity : AppCompatActivity(),
             @SuppressLint("SetTextI18n")
             override fun onPageSelected(position: Int) {
                 mFocusName = mListCityCollection[position].cityName
-                mTvTitle.text = "$mFocusName - ${mListCityCollection[position].countryName}"
-                mTvDate.text = mListCityCollection[position].date
+                mTvTitle.text = "$mFocusName, ${mListCityCollection[position].countryName}"
+                mTvDate.text = Dimen.getDate(mListCityCollection[position].date)
                 mDrawerLayout.setBackgroundResource(Image.getBackground(
                         mListCityCollection[position].icon,
                         mListCityCollection[position].day
                 ))
             }
         })
-        reloadListCityCollection()
-        reloadViewPager()
     }
 
     private fun initListener() {
@@ -226,8 +232,8 @@ class MainActivity : AppCompatActivity(),
             }
             reloadViewPager()
             mViewPager.currentItem = index
-            mTvTitle.text = "$mFocusName - ${mListCityCollection[index].countryName}"
-            mTvDate.text = mListCityCollection[index].date
+            mTvTitle.text = "$mFocusName, ${mListCityCollection[index].countryName}"
+            mTvDate.text = Dimen.getDate(mListCityCollection[index].date)
             mDrawerLayout.setBackgroundResource(Image.getBackground(
                     mListCityCollection[index].icon,
                     mListCityCollection[index].day
@@ -243,6 +249,7 @@ class MainActivity : AppCompatActivity(),
             initDataFromDatabase()
         }
         reloadListCityCollection()
+        mDialogLoading.dismiss()
     }
 
     private fun addNewCityCollection(cityCollection: CityCollection) {
@@ -251,18 +258,16 @@ class MainActivity : AppCompatActivity(),
             if (city.cityName == cityCollection.cityName) {
                 index = mListCityCollection.indexOf(city)
                 mFocusName = cityCollection.cityName
-                city.state = cityCollection.state
-                mViewPager.currentItem = index
                 break
             }
         }
         if (index == null) {
             mListCityCollection.add(cityCollection)
             mFocusName = cityCollection.cityName
-            reloadListCityCollection()
-            reloadViewPager()
-            mViewPager.currentItem = mListCityCollection.size - 1
         }
+        val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
+        editor.putString(Constants.FOCUS_POSITION, mFocusName)
+        editor.apply()
     }
 
     @SuppressLint("SetTextI18n")
@@ -275,8 +280,8 @@ class MainActivity : AppCompatActivity(),
                 reloadViewPager()
                 mViewPager.currentItem = 0
                 mFocusName = mListCityCollection[0].cityName
-                mTvTitle.text = "$mFocusName - ${mListCityCollection[0].countryName}"
-                mTvDate.text = mListCityCollection[0].date
+                mTvTitle.text = "$mFocusName, ${mListCityCollection[0].countryName}"
+                mTvDate.text = Dimen.getDate(mListCityCollection[0].date)
                 mDrawerLayout.setBackgroundResource(Image.getBackground(
                         mListCityCollection[0].icon,
                         mListCityCollection[0].day
@@ -317,6 +322,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun loadInformationWeather(cityName: String) {
+        mDialogLoading.show()
         val apiServices = ApiCityService()
         apiServices.getCityApi().getCurrentWeather(cityName).enqueue(this)
     }
@@ -328,11 +334,13 @@ class MainActivity : AppCompatActivity(),
             }
         } else {
             Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
+            mDialogLoading.dismiss()
         }
     }
 
     override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
         Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
+        mDialogLoading.dismiss()
     }
 
     private fun saveNewCityCollection(informationWeather: InformationWeather, state: Boolean = Constants.OTHER_LOCATION) {
