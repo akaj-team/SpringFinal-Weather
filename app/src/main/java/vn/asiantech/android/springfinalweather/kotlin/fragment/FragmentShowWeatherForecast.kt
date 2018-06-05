@@ -1,6 +1,7 @@
 package vn.asiantech.android.springfinalweather.kotlin.fragment
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
@@ -49,6 +50,7 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
     private lateinit var mCityName: String
     private lateinit var mDate: String
     private var mIsNewData = false
+    private lateinit var mDialogLoading: Dialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_show_weather_forecast, container, false)
@@ -66,6 +68,9 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
         mTvWind = view.findViewById(R.id.tvWind)
         mRecyclerView = view.findViewById(R.id.recyclerView)
         mLineChartView = view.findViewById(R.id.lineChartView)
+        mDialogLoading = Dialog(activity, R.style.Dialog)
+        mDialogLoading.setContentView(R.layout.dialog_waiting)
+        mDialogLoading.setCanceledOnTouchOutside(false)
     }
 
     @SuppressLint("SetTextI18n")
@@ -95,8 +100,14 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
             mTvHumidity.text = bundle.getInt(Constants.HUMIDITY).toString() + "%"
             mTvCloud.text = bundle.getInt(Constants.CLOUD).toString() + "%"
             mCityName = bundle.getString(Constants.CITY_NAME)
+            mDialogLoading.show()
             val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
-            weatherRepository?.getCityWeatherBy(mCityName, this)
+            if (isOnline() && !mIsNewData) {
+                mIsNewData = true
+                loadListWeatherFourDay(mCityName)
+            } else {
+                weatherRepository?.getCityWeatherBy(mCityName, this)
+            }
             mRecyclerViewAdapter = RecyclerViewAdapter(mListCityWeather, unitOfTemp)
             mRecyclerView.adapter = mRecyclerViewAdapter
             mRecyclerView.layoutManager = LinearLayoutManager(activity)
@@ -108,15 +119,12 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
     }
 
     override fun onLoadCityWeatherList(listCityWeather: List<CityWeather>) {
+        mDialogLoading.dismiss()
         mListCityWeather.clear()
         listCityWeather.forEach {
             mListCityWeather.add(it)
         }
         reloadRecyclerView()
-        if (isOnline() && !mIsNewData) {
-            mIsNewData = true
-            loadListWeatherFourDay(mCityName)
-        }
     }
 
     private fun loadListWeatherFourDay(cityName: String) {
@@ -129,7 +137,7 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
             }
 
             override fun onFailure(call: Call<InformationWeatherRecyclerView>?, t: Throwable?) {
-                Toast.makeText(context, R.string.notification, Toast.LENGTH_SHORT).show()
+                mDialogLoading.dismiss()
             }
         })
     }
@@ -197,5 +205,10 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
                 Toast.makeText(context, R.string.notification, Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mDialogLoading.dismiss()
     }
 }
