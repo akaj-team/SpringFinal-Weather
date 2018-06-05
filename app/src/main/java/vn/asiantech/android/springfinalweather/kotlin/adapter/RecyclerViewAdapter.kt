@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import vn.asiantech.android.springfinalweather.R
+import vn.asiantech.android.springfinalweather.kotlin.`object`.Dimen
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Image
 import vn.asiantech.android.springfinalweather.kotlin.model.CityWeather
 
@@ -34,7 +35,7 @@ class RecyclerViewAdapter(private val mListCityWeather: List<CityWeather>, priva
 
         @SuppressLint("SetTextI18n")
         fun bind(cityWeather: CityWeather) {
-            mTvDate.text = cityWeather.date
+            mTvDate.text = Dimen.getDateFormat(cityWeather.date)
             if (unitOfTemp == 0) {
                 mTvMaxTempList.text = cityWeather.tempMin.toString() + "°C"
                 mTvMinTempList.text = "/ " + cityWeather.tempMax.toString() + "°C"

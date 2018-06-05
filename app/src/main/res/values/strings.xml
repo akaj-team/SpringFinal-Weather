@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SpringFinal-Weather</string>
+    <string name="app_name">WeatherHDUncen</string>
     <string name="current_day">Current Day</string>
     <string name="temp">78°C</string>
     <string name="status">Heavy rain</string>
