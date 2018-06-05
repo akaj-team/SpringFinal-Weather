@@ -17,7 +17,6 @@ class Constants {
         const val HUMIDITY = "humidity"
         const val WIND = "wind"
         const val CLOUD = "cloud"
-        const val DATE1 = "2018-06-04"
         const val DESCRIPTION = "description"
         const val ICON = "icon"
         const val IS_DAY = "is_day"
@@ -25,7 +24,7 @@ class Constants {
         const val FINDLOCATION = "find_location"
 
         //const for Api
-        const val KEY = "0a842a2a89fa4aabb0570503183105"
+        const val KEY = "cdcbdbadb16f40f1bb034116180506"
         const val BASE_URL_WEATHER = "http://api.apixu.com/v1/"
         const val DAYS = 5
 

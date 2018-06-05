@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,13 +28,16 @@ import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Image
 import vn.asiantech.android.springfinalweather.kotlin.adapter.RecyclerViewAdapter
 import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiCityService
+import vn.asiantech.android.springfinalweather.kotlin.model.CityHistoryWeather
 import vn.asiantech.android.springfinalweather.kotlin.model.CityWeather
 import vn.asiantech.android.springfinalweather.kotlin.model.HistoryInformationWeather
 import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeatherRecyclerView
+import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityHistoryWeatherAsyncListener
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityWeatherAsyncListener
+import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnLoadListHistoryWeather
 import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 
-class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
+class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCityHistoryWeatherAsyncListener, OnLoadListHistoryWeather {
 
     private var mSharedPreferences: SharedPreferences? = null
     private lateinit var mTvTemp: TextView
@@ -46,9 +50,12 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mLineChartView: LineChartView
     private var mListCityWeather: MutableList<CityWeather> = mutableListOf()
+    private var mListCityHistoryWeather: MutableList<CityHistoryWeather> = mutableListOf()
     private lateinit var mCityName: String
     private lateinit var mDate: String
+    private lateinit var mSecondDate: String
     private var mIsNewData = false
+    private var mIsNewHistoryData = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_show_weather_forecast, container, false)
@@ -95,8 +102,11 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
             mTvHumidity.text = bundle.getInt(Constants.HUMIDITY).toString() + "%"
             mTvCloud.text = bundle.getInt(Constants.CLOUD).toString() + "%"
             mCityName = bundle.getString(Constants.CITY_NAME)
+            mDate = bundle.getString(Constants.DATE)
+            mSecondDate = mDate.split(" ")[0]
             val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
             weatherRepository?.getCityWeatherBy(mCityName, this)
+            weatherRepository?.getCityHistoryWeatherBy(mCityName, this)
             mRecyclerViewAdapter = RecyclerViewAdapter(mListCityWeather, unitOfTemp)
             mRecyclerView.adapter = mRecyclerViewAdapter
             mRecyclerView.layoutManager = LinearLayoutManager(activity)
@@ -119,6 +129,28 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
         }
     }
 
+    override fun onLoadCityHistoryWeatherList(listCityHistoryWeather: List<CityHistoryWeather>) {
+        val dataSet = LineSet()
+        listCityHistoryWeather.forEach {
+            dataSet.addPoint(Point(it.time.split(" ")[1].split(":")[0], it.tempC))
+        }
+        Log.d("zxc", "" + listCityHistoryWeather.size)
+        dataSet.color = Color.WHITE
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            activity?.resources?.getColor(R.color.colorGray, context?.theme)?.let { dataSet.setFill(it) }
+            activity?.resources?.getColor(R.color.colorWhite, context?.theme)?.let { mLineChartView.setLabelsColor(it) }
+        }
+        dataSet.thickness = 1f
+        if (dataSet.size() != 0) {
+            mLineChartView.addData(dataSet)
+            mLineChartView.show()
+        }
+        if (isOnline() && !mIsNewHistoryData) {
+            mIsNewHistoryData = true
+            loadLineChartTemp(mCityName)
+        }
+    }
+
     private fun loadListWeatherFourDay(cityName: String) {
         val apiServicesRecyclerView = ApiCityService()
         apiServicesRecyclerView.getCityApi().getFiveDayWeather(cityName).enqueue(object : Callback<InformationWeatherRecyclerView> {
@@ -129,6 +161,23 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
             }
 
             override fun onFailure(call: Call<InformationWeatherRecyclerView>?, t: Throwable?) {
+                Toast.makeText(context, R.string.notification, Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun loadLineChartTemp(cityName: String) {
+        val apiServicesHistoryInformationWeather = ApiCityService()
+        apiServicesHistoryInformationWeather.getCityApi().getHistoryWeather(cityName, mSecondDate).enqueue(object : Callback<HistoryInformationWeather> {
+            override fun onResponse(call: Call<HistoryInformationWeather>?, response: Response<HistoryInformationWeather>) {
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        saveNewCityHistoryWeather(it)
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<HistoryInformationWeather>?, t: Throwable?) {
                 Toast.makeText(context, R.string.notification, Toast.LENGTH_SHORT).show()
             }
         })
@@ -147,12 +196,29 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
                 cityWeather.tempMin = it.day.minTemp
                 cityWeather.icon = it.day.condition.icon
                 weatherRepository?.insert(cityWeather)
-            } else {
-                mDate = it.date
-                setLineChartTemp(mCityName)
             }
         }
         weatherRepository?.getCityWeatherBy(mCityName, this)
+    }
+
+    private fun saveNewCityHistoryWeather(historyInformationWeather: HistoryInformationWeather) {
+        val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
+        weatherRepository?.deleteHistoryBy(mCityName)
+        mListCityHistoryWeather.clear()
+        historyInformationWeather.forecast.forecastDay[0].hour.forEach {
+            val cityHistoryWeather = CityHistoryWeather()
+            cityHistoryWeather.cityName = mCityName
+            cityHistoryWeather.date = mSecondDate
+            cityHistoryWeather.tempC = it.tempC
+            cityHistoryWeather.time = it.time
+            mListCityHistoryWeather.add(cityHistoryWeather)
+        }
+        weatherRepository?.insertHistory(mListCityHistoryWeather, this)
+    }
+
+    override fun onLoadListHistoryWeather() {
+        val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
+        weatherRepository?.getCityHistoryWeatherBy(mCityName, this)
     }
 
     private fun getMetrePerSecond(speed: Float): Float {
@@ -171,31 +237,5 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener {
         val cm = activity?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
         val netInfo = cm?.activeNetworkInfo
         return netInfo != null && netInfo.isConnected
-    }
-
-    private fun setLineChartTemp(cityName: String) {
-        val apiServicesHistoryInformationWeather = ApiCityService()
-        apiServicesHistoryInformationWeather.getCityApi().getHistoryWeather(cityName, mDate).enqueue(object : Callback<HistoryInformationWeather> {
-            override fun onResponse(call: Call<HistoryInformationWeather>?, response: Response<HistoryInformationWeather>) {
-                if (response.isSuccessful) {
-                    val dataSet = LineSet()
-                    response.body()?.forecast?.forecastDay?.get(0)?.hour?.forEach {
-                        dataSet.addPoint(Point(it.time.split(" ")[1].split(":")[0], it.tempC))
-                    }
-                    dataSet.color = Color.WHITE
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        activity?.resources?.getColor(R.color.colorPurplePastel, context?.theme)?.let { dataSet.setFill(it) }
-                        activity?.resources?.getColor(R.color.colorWhite, context?.theme)?.let { mLineChartView.setLabelsColor(it) }
-                    }
-                    dataSet.thickness = 1f
-                    mLineChartView.addData(dataSet)
-                    mLineChartView.show()
-                }
-            }
-
-            override fun onFailure(call: Call<HistoryInformationWeather>?, t: Throwable?) {
-                Toast.makeText(context, R.string.notification, Toast.LENGTH_SHORT).show()
-            }
-        })
     }
 }

@@ -3,21 +3,23 @@ package vn.asiantech.android.springfinalweather.kotlin.room
 import android.content.Context
 import vn.asiantech.android.springfinalweather.kotlin.asynctask.*
 import vn.asiantech.android.springfinalweather.kotlin.dao.CityCollectionDao
+import vn.asiantech.android.springfinalweather.kotlin.dao.CityHistoryWeatherDao
 import vn.asiantech.android.springfinalweather.kotlin.dao.CityWeatherDao
 import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
+import vn.asiantech.android.springfinalweather.kotlin.model.CityHistoryWeather
 import vn.asiantech.android.springfinalweather.kotlin.model.CityWeather
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionAsyncListener
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityWeatherAsyncListener
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnInsertDoneListener
+import vn.asiantech.android.springfinalweather.kotlin.myinterface.*
 
 class WeatherRepository(context: Context) {
     private lateinit var mCityWeatherDao: CityWeatherDao
     private lateinit var mCityCollectionDao: CityCollectionDao
+    private lateinit var mCityHistoryWeatherDao: CityHistoryWeatherDao
 
     init {
         val weatherDatabase = WeatherDatabaseRoom.getWeatherDatabase(context)
         if (weatherDatabase != null) {
             mCityWeatherDao = weatherDatabase.cityWeatherDao()
+            mCityHistoryWeatherDao = weatherDatabase.cityHistoryWeatherDao()
             mCityCollectionDao = weatherDatabase.cityCollectionDao()
         }
     }
@@ -31,7 +33,7 @@ class WeatherRepository(context: Context) {
     }
 
     fun delete(cityCollection: CityCollection) {
-        DeleteCityCollectionAsyncTask(mCityCollectionDao, mCityWeatherDao).execute(cityCollection)
+        DeleteCityCollectionAsyncTask(mCityCollectionDao, mCityWeatherDao, mCityHistoryWeatherDao).execute(cityCollection)
     }
 
     fun deleteLocation() {
@@ -48,5 +50,17 @@ class WeatherRepository(context: Context) {
 
     fun deleteBy(cityName: String) {
         DeleteCityWeatherAsyncTask(mCityWeatherDao, cityName).execute()
+    }
+
+    fun getCityHistoryWeatherBy(cityName: String, listen: OnCityHistoryWeatherAsyncListener) {
+        GetAllCityHistoryWeatherAsyncTask(mCityHistoryWeatherDao, listen, cityName).execute()
+    }
+
+    fun insertHistory(cityHistoryWeather: List<CityHistoryWeather>, listen: OnLoadListHistoryWeather) {
+        InsertCityHistoryWeatherAsyncTask(mCityHistoryWeatherDao, listen).execute(cityHistoryWeather)
+    }
+
+    fun deleteHistoryBy(cityName: String) {
+        DeleteCityHistoryWeatherAsyncTask(mCityHistoryWeatherDao, cityName).execute()
     }
 }

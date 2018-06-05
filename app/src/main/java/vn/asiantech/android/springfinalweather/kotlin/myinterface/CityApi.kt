@@ -32,7 +32,7 @@ interface CityApi {
     @GET("history.json")
     fun getHistoryWeather(
             @Query("q") name: String,
-            @Query("dt") dateTime: String = Constants.DATE1,
+            @Query("dt") dateTime: String,
             @Query("key") key: String = Constants.KEY
     ): Call<HistoryInformationWeather>
 }
