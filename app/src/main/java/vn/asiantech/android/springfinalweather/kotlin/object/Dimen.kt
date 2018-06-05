@@ -1,6 +1,8 @@
 package vn.asiantech.android.springfinalweather.kotlin.`object`
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import java.text.SimpleDateFormat
 
 class Dimen {
     companion object {
@@ -20,6 +22,13 @@ class Dimen {
                 result = activity.resources.getDimensionPixelSize(resourceId)
             }
             return result
+        }
+
+        @SuppressLint("SimpleDateFormat")
+        fun getDate(day: String): String {
+            val dateParse = SimpleDateFormat("yyyy-MM-dd HH:mm")
+            val dateFormat = SimpleDateFormat("MM/dd/yyyy")
+            return dateFormat.format(dateParse.parse(day))
         }
     }
 }
