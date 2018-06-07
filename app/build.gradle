@@ -51,10 +51,13 @@ dependencies {
     kapt "android.arch.persistence.room:compiler:$roomVersion"
     //  linechart
     implementation 'com.diogobernardino:williamchart:2.5.0'
+    implementation 'com.jjoe64:graphview:4.2.2'
+
 }
 
 apply from: "../ci-java.gradle"
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }

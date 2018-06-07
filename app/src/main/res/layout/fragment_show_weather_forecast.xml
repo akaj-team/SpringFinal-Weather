@@ -82,11 +82,12 @@
         android:layout_marginTop="5dp" />
 
     <com.db.chart.view.LineChartView
-        android:layout_marginTop="10dp"
         android:id="@+id/lineChartView"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:layout_below="@+id/recyclerView">
+        android:layout_below="@+id/recyclerView"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="10dp">
 
     </com.db.chart.view.LineChartView>
 </RelativeLayout>
