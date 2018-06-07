@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity(),
         initData()
         when {
             intent.getBooleanExtra(Constants.FINDLOCATION, false) -> {
-                if (isOnline()){
+                if (isOnline()) {
                     checkLocationPermission()
                 } else {
                     Toast.makeText(this, R.string.connect_fail, Toast.LENGTH_SHORT).show()
@@ -152,6 +152,7 @@ class MainActivity : AppCompatActivity(),
 
     private fun reloadViewPager() {
         mViewPagerAdapter.notifyDataSetChanged()
+        mViewPager.offscreenPageLimit = mListCityCollection.size
     }
 
     private fun reloadListCityCollection() {
