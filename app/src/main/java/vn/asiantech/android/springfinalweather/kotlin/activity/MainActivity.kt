@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.os.Bundle
@@ -73,7 +74,7 @@ class MainActivity : AppCompatActivity(),
         initData()
         when {
             intent.getBooleanExtra(Constants.FINDLOCATION, false) -> {
-                if (isOnline()){
+                if (isOnline()) {
                     checkLocationPermission()
                 } else {
                     Toast.makeText(this, R.string.connect_fail, Toast.LENGTH_SHORT).show()
@@ -102,28 +103,41 @@ class MainActivity : AppCompatActivity(),
         editor.apply()
         if (granted) {
             val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            val apiServices = ApiCityService()
-            apiServices.getCityApi()
-                    .getCurrentWeather("${location.latitude},${location.longitude}")
-                    .enqueue(object : Callback<InformationWeather> {
-                        override fun onResponse(call: Call<InformationWeather>, response: Response<InformationWeather>) {
-                            if (response.isSuccessful) {
-                                response.body()?.let {
-                                    mIsAddNewCity = true
-                                    saveNewCityCollection(it, Constants.USER_LOCATION)
+            val providers = locationManager.getProviders(true)
+            var location: Location? = null
+            for (provider in providers) {
+                location = locationManager.getLastKnownLocation(provider)
+                if (location == null) {
+                    continue
+                }
+                break
+            }
+            if (location != null) {
+                val apiServices = ApiCityService()
+                apiServices.getCityApi()
+                        .getCurrentWeather("${location.latitude},${location.longitude}")
+                        .enqueue(object : Callback<InformationWeather> {
+                            override fun onResponse(call: Call<InformationWeather>, response: Response<InformationWeather>) {
+                                if (response.isSuccessful) {
+                                    response.body()?.let {
+                                        mIsAddNewCity = true
+                                        saveNewCityCollection(it, Constants.USER_LOCATION)
+                                    }
+                                } else {
+                                    Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
+                                    mDialogLoading.dismiss()
                                 }
-                            } else {
-                                Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
+                            }
+
+                            override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
+                                Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
                                 mDialogLoading.dismiss()
                             }
-                        }
-
-                        override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
-                            Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
-                            mDialogLoading.dismiss()
-                        }
-                    })
+                        })
+            } else {
+                Toast.makeText(this, R.string.city_not_found, Toast.LENGTH_SHORT).show()
+                goTo(SearchActivity::class.java)
+            }
         }
     }
 
@@ -251,17 +265,42 @@ class MainActivity : AppCompatActivity(),
                     mListCityCollection[index].day
             ))
         } else {
-            goTo(SearchActivity::class.java, false)
+            ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    Constants.LOCATION_PERMISSION_REQUEST
+            )
         }
-        if (isOnline() && !mIsNewData) {
+        if (isOnline() && !mIsNewData && mListCityCollection.isNotEmpty()) {
+            mIsNewData = true
             mListCityCollection.forEach {
                 loadInformationWeather(it.cityName)
             }
-            mIsNewData = true
-            initDataFromDatabase()
         }
         reloadListCityCollection()
         mDialogLoading.dismiss()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+            val sharedPreferences = getSharedPreferences(
+                    getString(R.string.shared_preference_name),
+                    Context.MODE_PRIVATE
+            )
+            val granted = sharedPreferences.getBoolean(Constants.LOCATION_PERMISSION, true)
+            if (isOnline()) {
+                if (granted) {
+                    checkLocationPermission()
+                } else {
+                    goTo(SearchActivity::class.java, false)
+                }
+            } else {
+                Toast.makeText(this, R.string.connect_fail, Toast.LENGTH_SHORT).show()
+                goTo(SearchActivity::class.java, false)
+            }
+        } else {
+            goTo(SearchActivity::class.java, false)
+        }
     }
 
     private fun addNewCityCollection(cityCollection: CityCollection) {

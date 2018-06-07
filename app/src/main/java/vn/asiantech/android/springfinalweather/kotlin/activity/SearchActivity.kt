@@ -3,6 +3,7 @@ package vn.asiantech.android.springfinalweather.kotlin.activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -52,7 +53,7 @@ class SearchActivity : AppCompatActivity(),
         val w = window
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
         mToolbar = findViewById(R.id.toolBarSearch)
-        mToolbar.setPadding(0, Dimen.getStatusBarHeight(this)*3/2,0,Dimen.getStatusBarHeight(this)/2)
+        mToolbar.setPadding(0, Dimen.getStatusBarHeight(this) * 3 / 2, 0, Dimen.getStatusBarHeight(this) / 2)
         mImgBack = findViewById(R.id.imgIconBack)
         mEdtCityName = findViewById(R.id.edtCityName)
         mRecyclerView = findViewById(R.id.recyclerViewResultLocation)
@@ -123,12 +124,22 @@ class SearchActivity : AppCompatActivity(),
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
-            editor.putBoolean(Constants.LOCATION_PERMISSION, true)
-            editor.apply()
-            val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra(Constants.FINDLOCATION, true)
-            startActivity(intent)
+            if (isOnline()) {
+                val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
+                editor.putBoolean(Constants.LOCATION_PERMISSION, true)
+                editor.apply()
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra(Constants.FINDLOCATION, true)
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, R.string.connect_fail, Toast.LENGTH_SHORT).show()
+            }
         }
+    }
+
+    private fun isOnline(): Boolean {
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val netInfo = cm.activeNetworkInfo
+        return netInfo != null && netInfo.isConnected
     }
 }
