@@ -11,7 +11,7 @@
         android:id="@+id/toolBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPurple"
+        android:background="@color/colorMain"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -72,7 +72,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="18dp"
-        android:background="@color/colorViolet"
+        android:background="@color/colorFocus"
         app:layout_constraintTop_toBottomOf="@+id/tvCurrentLocation" />
 
     <TextView
@@ -81,7 +81,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="@string/unit"
-        android:textColor="@color/colorPurple"
+        android:textColor="@color/colorMain"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/tvCurrentLocation"
@@ -110,7 +110,7 @@
             android:id="@+id/tvUnitOfTemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorPurplePastel" />
+            android:textColor="@color/colorPress" />
     </LinearLayout>
 
     <LinearLayout
@@ -136,13 +136,13 @@
             android:id="@+id/tvUnitOfWindSpeed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorPurplePastel" />
+            android:textColor="@color/colorPress" />
     </LinearLayout>
 
     <View
         android:id="@+id/vLine2"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorViolet"
+        android:background="@color/colorFocus"
         app:layout_constraintTop_toBottomOf="@+id/llUnitOfWindSpeed" />
 </android.support.constraint.ConstraintLayout>

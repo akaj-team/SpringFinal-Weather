@@ -6,12 +6,14 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -23,6 +25,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -43,7 +46,7 @@ import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 
 class MainActivity : AppCompatActivity(),
         View.OnClickListener, OnCityCollectionAsyncListener, OnCityCollectionChangeListener,
-        DrawerLayout.DrawerListener, Callback<InformationWeather>, OnInsertDoneListener {
+        DrawerLayout.DrawerListener, Callback<InformationWeather>, OnInsertDoneListener, SwipeRefreshLayout.OnRefreshListener {
     private lateinit var mToolBar: Toolbar
     private lateinit var mRlDrawer: RelativeLayout
     private lateinit var mDrawerLayout: DrawerLayout
@@ -73,7 +76,7 @@ class MainActivity : AppCompatActivity(),
         initData()
         when {
             intent.getBooleanExtra(Constants.FINDLOCATION, false) -> {
-                if (isOnline()){
+                if (isOnline()) {
                     checkLocationPermission()
                 } else {
                     Toast.makeText(this, R.string.connect_fail, Toast.LENGTH_SHORT).show()
@@ -102,28 +105,41 @@ class MainActivity : AppCompatActivity(),
         editor.apply()
         if (granted) {
             val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            val apiServices = ApiCityService()
-            apiServices.getCityApi()
-                    .getCurrentWeather("${location.latitude},${location.longitude}")
-                    .enqueue(object : Callback<InformationWeather> {
-                        override fun onResponse(call: Call<InformationWeather>, response: Response<InformationWeather>) {
-                            if (response.isSuccessful) {
-                                response.body()?.let {
-                                    mIsAddNewCity = true
-                                    saveNewCityCollection(it, Constants.USER_LOCATION)
+            val providers = locationManager.getProviders(true)
+            var location: Location? = null
+            for (provider in providers) {
+                location = locationManager.getLastKnownLocation(provider)
+                if (location == null) {
+                    continue
+                }
+                break
+            }
+            if (location != null) {
+                val apiServices = ApiCityService()
+                apiServices.getCityApi()
+                        .getCurrentWeather("${location.latitude},${location.longitude}")
+                        .enqueue(object : Callback<InformationWeather> {
+                            override fun onResponse(call: Call<InformationWeather>, response: Response<InformationWeather>) {
+                                if (response.isSuccessful) {
+                                    response.body()?.let {
+                                        mIsAddNewCity = true
+                                        saveNewCityCollection(it, Constants.USER_LOCATION)
+                                    }
+                                } else {
+                                    Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
+                                    mDialogLoading.dismiss()
                                 }
-                            } else {
-                                Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
+                            }
+
+                            override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
+                                Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
                                 mDialogLoading.dismiss()
                             }
-                        }
-
-                        override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
-                            Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
-                            mDialogLoading.dismiss()
-                        }
-                    })
+                        })
+            } else {
+                Toast.makeText(this, R.string.city_not_found, Toast.LENGTH_SHORT).show()
+                goTo(SearchActivity::class.java)
+            }
         }
     }
 
@@ -152,6 +168,7 @@ class MainActivity : AppCompatActivity(),
 
     private fun reloadViewPager() {
         mViewPagerAdapter.notifyDataSetChanged()
+        mViewPager.offscreenPageLimit = mListCityCollection.size
     }
 
     private fun reloadListCityCollection() {
@@ -160,7 +177,12 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun initData() {
-        mCityCollectionAdapter = CityCollectionAdapter(mListCityCollection, this)
+        val sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE)
+        mCityCollectionAdapter = CityCollectionAdapter(
+                mListCityCollection,
+                this,
+                sharedPreferences.getInt(Constants.UNIT_OF_TEMP, 0)
+        )
         mRecyclerView.adapter = mCityCollectionAdapter
         mRecyclerView.layoutManager = LinearLayoutManager(this)
         mViewPagerAdapter = ViewPagerAdapter(supportFragmentManager, mListCityCollection)
@@ -172,6 +194,14 @@ class MainActivity : AppCompatActivity(),
         mLocation = sharedPreferences.getString(Constants.NAME_LOCATION, "")
         val weatherRepository = WeatherRepository(this)
         weatherRepository.getAllCityCollection(this)
+    }
+
+    private fun initListener() {
+        mDrawerLayout.addDrawerListener(this)
+        mImgMenuIcon.setOnClickListener(this)
+        mTvSetting.setOnClickListener(this)
+        mTvAddLocation.setOnClickListener(this)
+        swipeRefreshLayout.setOnRefreshListener(this)
         mViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
             }
@@ -192,11 +222,16 @@ class MainActivity : AppCompatActivity(),
         })
     }
 
-    private fun initListener() {
-        mDrawerLayout.addDrawerListener(this)
-        mImgMenuIcon.setOnClickListener(this)
-        mTvSetting.setOnClickListener(this)
-        mTvAddLocation.setOnClickListener(this)
+    override fun onRefresh() {
+        if (isOnline()) {
+            mFocusName = mListCityCollection[mViewPager.currentItem].cityName
+            val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
+            editor.putString(Constants.FOCUS_POSITION, mFocusName)
+            editor.apply()
+            loadInformationWeather(mFocusName)
+        } else {
+            swipeRefreshLayout.isRefreshing = false
+        }
     }
 
     override fun onClick(v: View?) {
@@ -251,17 +286,43 @@ class MainActivity : AppCompatActivity(),
                     mListCityCollection[index].day
             ))
         } else {
-            goTo(SearchActivity::class.java, false)
+            ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    Constants.LOCATION_PERMISSION_REQUEST
+            )
         }
-        if (isOnline() && !mIsNewData) {
+        if (isOnline() && !mIsNewData && mListCityCollection.isNotEmpty()) {
+            mIsNewData = true
             mListCityCollection.forEach {
                 loadInformationWeather(it.cityName)
             }
-            mIsNewData = true
-            initDataFromDatabase()
         }
         reloadListCityCollection()
         mDialogLoading.dismiss()
+        swipeRefreshLayout.isRefreshing = false
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+            val sharedPreferences = getSharedPreferences(
+                    getString(R.string.shared_preference_name),
+                    Context.MODE_PRIVATE
+            )
+            val granted = sharedPreferences.getBoolean(Constants.LOCATION_PERMISSION, true)
+            if (isOnline()) {
+                if (granted) {
+                    checkLocationPermission()
+                } else {
+                    goTo(SearchActivity::class.java, false)
+                }
+            } else {
+                Toast.makeText(this, R.string.connect_fail, Toast.LENGTH_SHORT).show()
+                goTo(SearchActivity::class.java, false)
+            }
+        } else {
+            goTo(SearchActivity::class.java, false)
+        }
     }
 
     private fun addNewCityCollection(cityCollection: CityCollection) {
@@ -334,7 +395,9 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun loadInformationWeather(cityName: String) {
-        mDialogLoading.show()
+        if (!swipeRefreshLayout.isRefreshing) {
+            mDialogLoading.show()
+        }
         val apiServices = ApiCityService()
         apiServices.getCityApi().getCurrentWeather(cityName).enqueue(this)
     }
