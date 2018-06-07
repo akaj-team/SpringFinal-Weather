@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -24,6 +25,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -44,7 +46,7 @@ import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 
 class MainActivity : AppCompatActivity(),
         View.OnClickListener, OnCityCollectionAsyncListener, OnCityCollectionChangeListener,
-        DrawerLayout.DrawerListener, Callback<InformationWeather>, OnInsertDoneListener {
+        DrawerLayout.DrawerListener, Callback<InformationWeather>, OnInsertDoneListener, SwipeRefreshLayout.OnRefreshListener {
     private lateinit var mToolBar: Toolbar
     private lateinit var mRlDrawer: RelativeLayout
     private lateinit var mDrawerLayout: DrawerLayout
@@ -192,6 +194,14 @@ class MainActivity : AppCompatActivity(),
         mLocation = sharedPreferences.getString(Constants.NAME_LOCATION, "")
         val weatherRepository = WeatherRepository(this)
         weatherRepository.getAllCityCollection(this)
+    }
+
+    private fun initListener() {
+        mDrawerLayout.addDrawerListener(this)
+        mImgMenuIcon.setOnClickListener(this)
+        mTvSetting.setOnClickListener(this)
+        mTvAddLocation.setOnClickListener(this)
+        swipeRefreshLayout.setOnRefreshListener(this)
         mViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
             }
@@ -212,11 +222,16 @@ class MainActivity : AppCompatActivity(),
         })
     }
 
-    private fun initListener() {
-        mDrawerLayout.addDrawerListener(this)
-        mImgMenuIcon.setOnClickListener(this)
-        mTvSetting.setOnClickListener(this)
-        mTvAddLocation.setOnClickListener(this)
+    override fun onRefresh() {
+        if (isOnline()) {
+            mFocusName = mListCityCollection[mViewPager.currentItem].cityName
+            val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
+            editor.putString(Constants.FOCUS_POSITION, mFocusName)
+            editor.apply()
+            loadInformationWeather(mFocusName)
+        } else {
+            swipeRefreshLayout.isRefreshing = false
+        }
     }
 
     override fun onClick(v: View?) {
@@ -285,6 +300,7 @@ class MainActivity : AppCompatActivity(),
         }
         reloadListCityCollection()
         mDialogLoading.dismiss()
+        swipeRefreshLayout.isRefreshing = false
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -379,7 +395,9 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun loadInformationWeather(cityName: String) {
-        mDialogLoading.show()
+        if (!swipeRefreshLayout.isRefreshing) {
+            mDialogLoading.show()
+        }
         val apiServices = ApiCityService()
         apiServices.getCityApi().getCurrentWeather(cityName).enqueue(this)
     }
