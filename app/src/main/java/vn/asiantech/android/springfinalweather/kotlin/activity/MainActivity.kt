@@ -166,6 +166,7 @@ class MainActivity : AppCompatActivity(),
 
     private fun reloadViewPager() {
         mViewPagerAdapter.notifyDataSetChanged()
+        mViewPager.offscreenPageLimit = mListCityCollection.size
     }
 
     private fun reloadListCityCollection() {
