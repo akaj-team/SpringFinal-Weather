@@ -3,10 +3,10 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="colorPurple">#8A409B</color>
+    <color name="colorMain">#4f606c</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorBlack">#000000</color>
-    <color name="colorViolet">#e7d0e6</color>
-    <color name="colorPurplePastel">#CC70E2</color>
+    <color name="colorFocus">#a6c0c8ce</color>
+    <color name="colorPress">#9f9caebc</color>
     <color name="colorGray">#c6c6c6</color>
 </resources>

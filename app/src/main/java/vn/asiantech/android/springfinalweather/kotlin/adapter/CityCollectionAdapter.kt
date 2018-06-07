@@ -5,16 +5,17 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import kotlinx.android.synthetic.main.item_city_collection.view.*
 import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
+import vn.asiantech.android.springfinalweather.kotlin.`object`.Image
 import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionChangeListener
 
 class CityCollectionAdapter(
         private var mListCity: MutableList<CityCollection>,
-        private var mListener: OnCityCollectionChangeListener
+        private var mListener: OnCityCollectionChangeListener,
+        private var mUnitOfTemp: Int
 ) : RecyclerView.Adapter<CityCollectionAdapter.CityCollectionHolder>() {
     private var mFocusItem: String = ""
     fun setFocusItem(focusItem: String) {
@@ -26,7 +27,7 @@ class CityCollectionAdapter(
     }
 
     override fun onBindViewHolder(holder: CityCollectionHolder, position: Int) {
-        holder.bind(mListCity[position], mFocusItem)
+        holder.bind(mListCity[position], mFocusItem, mUnitOfTemp)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CityCollectionHolder {
@@ -36,30 +37,39 @@ class CityCollectionAdapter(
 
     class CityCollectionHolder(itemView: View, private var listener: OnCityCollectionChangeListener)
         : RecyclerView.ViewHolder(itemView) {
-        private var mTvCityName: TextView = itemView.findViewById(R.id.tvCityName)
-        private var mImgIcon: ImageView = itemView.findViewById(R.id.imgBtnStateOrDelete)
-
         @SuppressLint("SetTextI18n", "ResourceAsColor")
-        fun bind(cityCollection: CityCollection, focusName: String) {
-            mTvCityName.text = cityCollection.cityName
-            if (cityCollection.state == Constants.USER_LOCATION) {
-                mImgIcon.setImageResource(R.drawable.ic_location_purple_24dp)
+        fun bind(cityCollection: CityCollection, focusName: String, unitOfTemp: Int) {
+            itemView.tvCityName.text = cityCollection.cityName
+            if (unitOfTemp == 0) {
+                itemView.tvTemp.text = cityCollection.temp.toInt().toString() + "°C"
             } else {
-                mImgIcon.setImageResource(R.drawable.ic_cancel_black_24dp)
+                itemView.tvTemp.text = getFahrenheitDegree(cityCollection.temp).toString() + "°F"
             }
-            mImgIcon.setOnClickListener {
+            itemView.imgWeather.setImageResource(Image.getIcon(cityCollection.icon, cityCollection.day))
+            if (cityCollection.state == Constants.USER_LOCATION) {
+                itemView.imgBtnStateOrDelete.setImageResource(R.drawable.ic_location_24dp)
+            } else {
+                itemView.imgBtnStateOrDelete.setImageResource(R.drawable.ic_cancel_24dp)
+            }
+            itemView.imgBtnStateOrDelete.setOnClickListener {
                 if (!cityCollection.state) {
                     listener.onDeleteCityCollection(cityCollection)
                 }
             }
-            mTvCityName.setOnClickListener {
-                listener.onChangeShowCityCollection(cityCollection)
-                itemView.requestFocus()
+            itemView.setOnFocusChangeListener { _, hasFocus ->
+                if (hasFocus) {
+                    listener.onChangeShowCityCollection(cityCollection)
+                }
             }
 
             if (cityCollection.cityName == focusName) {
                 itemView.requestFocus()
             }
+        }
+
+        private fun getFahrenheitDegree(fah: Float): Int {
+            val fahrenheit = fah.times(9).div(5) + 32
+            return fahrenheit.toInt()
         }
     }
 }
