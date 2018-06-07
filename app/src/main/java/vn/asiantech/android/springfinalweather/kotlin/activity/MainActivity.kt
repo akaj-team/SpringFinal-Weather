@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity(),
         initData()
         when {
             intent.getBooleanExtra(Constants.FINDLOCATION, false) -> {
-                if (isOnline()){
+                if (isOnline()) {
                     checkLocationPermission()
                 } else {
                     Toast.makeText(this, R.string.connect_fail, Toast.LENGTH_SHORT).show()
@@ -160,7 +160,12 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun initData() {
-        mCityCollectionAdapter = CityCollectionAdapter(mListCityCollection, this)
+        val sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE)
+        mCityCollectionAdapter = CityCollectionAdapter(
+                mListCityCollection,
+                this,
+                sharedPreferences.getInt(Constants.UNIT_OF_TEMP, 0)
+        )
         mRecyclerView.adapter = mCityCollectionAdapter
         mRecyclerView.layoutManager = LinearLayoutManager(this)
         mViewPagerAdapter = ViewPagerAdapter(supportFragmentManager, mListCityCollection)
