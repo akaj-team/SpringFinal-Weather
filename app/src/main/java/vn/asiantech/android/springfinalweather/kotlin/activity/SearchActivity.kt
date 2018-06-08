@@ -7,15 +7,12 @@ import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_search.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -30,10 +27,6 @@ import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnSelectCityLi
 
 class SearchActivity : AppCompatActivity(),
         View.OnClickListener, TextWatcher, Callback<List<City>>, OnSelectCityListener {
-    private lateinit var toolBarSearch: Toolbar
-    private lateinit var imgIconBack: ImageView
-    private lateinit var edtCityName: EditText
-    private lateinit var recyclerViewResultLocation: RecyclerView
     private lateinit var mCityPredictionAdapter: CityPredictionAdapter
     private lateinit var mCityApi: CityApi
     private var mListCity: MutableList<City> = mutableListOf()
