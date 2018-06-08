@@ -20,6 +20,7 @@
             android:layout_width="135dp"
             android:layout_height="110dp"
             android:layout_alignBottom="@+id/imgIcon"
+            android:layout_marginLeft="10dp"
             android:gravity="center"
             android:text="@string/temp"
             android:textColor="@color/colorWhite"
@@ -92,8 +93,6 @@
             android:layout_height="150dp"
             android:layout_below="@+id/recyclerView"
             android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp">
-
-        </com.db.chart.view.LineChartView>
+            android:layout_marginTop="10dp" />
     </RelativeLayout>
 </android.support.v4.widget.SwipeRefreshLayout>
