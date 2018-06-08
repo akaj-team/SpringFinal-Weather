@@ -149,12 +149,9 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
             activity?.resources?.getColor(R.color.colorWhite, context?.theme)?.let { mView.lineChartView.setLabelsColor(it) }
         }
         dataSet.color = Color.WHITE
-        dataSet.isSmooth = true
         dataSet.thickness = 8f
         dataSet.setDotsRadius(5f)
-        dataSet.setGradientFill(intArrayOf(Color.parseColor("#b1adad"), R.color.colorGray), null)
         if (dataSet.size() != 0) {
-            mView.lineChartView.setXAxis(false)
             mView.lineChartView.setLabelsFormat(decimalFormat)
             mView.lineChartView.addData(dataSet)
             mView.lineChartView.show()
