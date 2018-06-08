@@ -8,8 +8,5 @@
     <color name="colorBlack">#000000</color>
     <color name="colorFocus">#a6c0c8ce</color>
     <color name="colorPress">#9f9caebc</color>
-    <color name="colorGray">#5e5d5d</color>
-    <color name="colorBlue">#0098f0</color>
-    <color name="colorDark">#2d374c</color>
-    <color name="colorYellow">#d0da07</color>
+    <color name="colorGray">#c6c6c6</color>
 </resources>
