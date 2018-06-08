@@ -9,10 +9,11 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.View
 import android.view.WindowManager
-import android.widget.*
+import android.widget.CompoundButton
+import android.widget.TextView
+import kotlinx.android.synthetic.main.activity_setting.*
 import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Dimen
@@ -20,16 +21,9 @@ import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 
 class SettingActivity : AppCompatActivity(),
         View.OnClickListener, CompoundButton.OnCheckedChangeListener {
-    private lateinit var mToolbar: Toolbar
-    private lateinit var mImgBack: ImageView
-    private lateinit var mSwitchAllowCurrentLocation: Switch
     private lateinit var mSharedPreferences: SharedPreferences
     private lateinit var mEditor: SharedPreferences.Editor
     private lateinit var mUnitDialog: AlertDialog
-    private lateinit var mLlUnitOfTemp: LinearLayout
-    private lateinit var mLlUnitOfWindSpeed: LinearLayout
-    private lateinit var mTvUnitOfTemp: TextView
-    private lateinit var mTvUnitOfWindSpeed: TextView
     private var mCheckedItemTemp: Int = 0
     private var mCheckedItemWindSpeed: Int = 0
     private val mItemsUnitOfTemp = arrayOf("C degree", "F degree")
@@ -45,23 +39,15 @@ class SettingActivity : AppCompatActivity(),
     }
 
     private fun initViews() {
-        val w = window
-        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-        mToolbar = findViewById(R.id.toolBar)
-        mToolbar.setPadding(0, Dimen.getStatusBarHeight(this)*3/2, 0, Dimen.getStatusBarHeight(this)/2)
-        mImgBack = findViewById(R.id.imgIconBack)
-        mSwitchAllowCurrentLocation = findViewById(R.id.switchAllowCurrentLocation)
-        mLlUnitOfTemp = findViewById(R.id.llUnitOfTemp)
-        mLlUnitOfWindSpeed = findViewById(R.id.llUnitOfWindSpeed)
-        mTvUnitOfTemp = findViewById(R.id.tvUnitOfTemp)
-        mTvUnitOfWindSpeed = findViewById(R.id.tvUnitOfWindSpeed)
+        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+        toolBar.setPadding(0, Dimen.getStatusBarHeight(this) * 3 / 2, 0, Dimen.getStatusBarHeight(this) / 2)
     }
 
     private fun initListener() {
-        mImgBack.setOnClickListener(this)
-        mSwitchAllowCurrentLocation.setOnCheckedChangeListener(this)
-        mLlUnitOfTemp.setOnClickListener(this)
-        mLlUnitOfWindSpeed.setOnClickListener(this)
+        imgIconBack.setOnClickListener(this)
+        switchAllowCurrentLocation.setOnCheckedChangeListener(this)
+        llUnitOfTemp.setOnClickListener(this)
+        llUnitOfWindSpeed.setOnClickListener(this)
     }
 
     private fun initData() {
@@ -71,11 +57,11 @@ class SettingActivity : AppCompatActivity(),
         )
         mEditor = mSharedPreferences.edit()
         mGranted = mSharedPreferences.getBoolean(Constants.LOCATION_PERMISSION, false)
-        mSwitchAllowCurrentLocation.isChecked = mGranted
+        switchAllowCurrentLocation.isChecked = mGranted
         mCheckedItemTemp = mSharedPreferences.getInt(Constants.UNIT_OF_TEMP, 0)
         mCheckedItemWindSpeed = mSharedPreferences.getInt(Constants.UNIT_OF_WIND_SPEED, 0)
-        mTvUnitOfTemp.text = mItemsUnitOfTemp[mCheckedItemTemp]
-        mTvUnitOfWindSpeed.text = mItemsUnitOfWindSpeed[mCheckedItemWindSpeed]
+        tvUnitOfTemp.text = mItemsUnitOfTemp[mCheckedItemTemp]
+        tvUnitOfWindSpeed.text = mItemsUnitOfWindSpeed[mCheckedItemWindSpeed]
     }
 
     override fun onClick(v: View?) {
@@ -94,13 +80,13 @@ class SettingActivity : AppCompatActivity(),
                     mItemsUnitOfTemp,
                     Constants.UNIT_OF_TEMP,
                     R.string.temperature,
-                    mTvUnitOfTemp
+                    tvUnitOfTemp
             )
             R.id.llUnitOfWindSpeed -> showDialog(
                     mItemsUnitOfWindSpeed,
                     Constants.UNIT_OF_WIND_SPEED,
                     R.string.wind_speed,
-                    mTvUnitOfWindSpeed
+                    tvUnitOfWindSpeed
             )
         }
     }
@@ -138,7 +124,7 @@ class SettingActivity : AppCompatActivity(),
             mEditor.apply()
         } else {
             mGranted = false
-            mSwitchAllowCurrentLocation.isChecked = false
+            switchAllowCurrentLocation.isChecked = false
         }
     }
 

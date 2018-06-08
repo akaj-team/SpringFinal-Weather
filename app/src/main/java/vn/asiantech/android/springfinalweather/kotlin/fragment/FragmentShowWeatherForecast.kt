@@ -10,15 +10,11 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import com.db.chart.model.LineSet
 import com.db.chart.model.Point
-import com.db.chart.view.LineChartView
 import kotlinx.android.synthetic.main.fragment_show_weather_forecast.view.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -36,17 +32,9 @@ import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnRefreshListe
 import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 
 class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCityHistoryWeatherAsyncListener, OnLoadListHistoryWeather {
-
     private var mSharedPreferences: SharedPreferences? = null
-    private lateinit var mTvTemp: TextView
-    private lateinit var mImgIcon: ImageView
-    private lateinit var mTvStatus: TextView
-    private lateinit var mTvHumidity: TextView
-    private lateinit var mTvCloud: TextView
-    private lateinit var mTvWind: TextView
     private lateinit var mRecyclerViewAdapter: RecyclerViewAdapter
-    private lateinit var mRecyclerView: RecyclerView
-    private lateinit var mLineChartView: LineChartView
+    private lateinit var mView: View
     private var mListCityWeather: MutableList<CityWeather> = mutableListOf()
     private var mListCityHistoryWeather: MutableList<CityHistoryWeather> = mutableListOf()
     private lateinit var mCityName: String
@@ -62,31 +50,23 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_show_weather_forecast, container, false)
-        initViews(view)
-        initListener(view)
+        mView = inflater.inflate(R.layout.fragment_show_weather_forecast, container, false)
+        initViews()
+        initListener()
         initData()
-        return view
+        return mView
     }
 
-    private fun initViews(view: View) {
-        mTvTemp = view.findViewById(R.id.tvTemp)
-        mImgIcon = view.findViewById(R.id.imgIcon)
-        mTvStatus = view.findViewById(R.id.tvStatus)
-        mTvHumidity = view.findViewById(R.id.tvHumidity)
-        mTvCloud = view.findViewById(R.id.tvCloud)
-        mTvWind = view.findViewById(R.id.tvWind)
-        mRecyclerView = view.findViewById(R.id.recyclerView)
-        mLineChartView = view.findViewById(R.id.lineChartView)
+    private fun initViews() {
         mDialogLoading = Dialog(activity, R.style.Dialog)
         mDialogLoading.setContentView(R.layout.dialog_waiting)
         mDialogLoading.setCanceledOnTouchOutside(false)
         mDialogLoading.setCancelable(true)
     }
 
-    private fun initListener(view: View) {
-        view.swipeRefresh.setOnRefreshListener {
-            mListener?.onRefresh(mCityName, view.swipeRefresh)
+    private fun initListener() {
+        mView.swipeRefresh.setOnRefreshListener {
+            mListener?.onRefresh(mCityName, mView.swipeRefresh)
         }
     }
 
@@ -99,24 +79,24 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
                     getString(R.string.shared_preference_name),
                     Context.MODE_PRIVATE)
             if (mSharedPreferences?.getInt(Constants.UNIT_OF_WIND_SPEED, 0) == 0) {
-                mTvWind.text = cityCollection.wind.toString() + " km/h"
+                mView.tvWind.text = cityCollection.wind.toString() + " km/h"
             } else {
-                mTvWind.text = getMetrePerSecond(cityCollection.wind).toString() + " m/s"
+                mView.tvWind.text = getMetrePerSecond(cityCollection.wind).toString() + " m/s"
             }
             val unitOfTemp = mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0)
             if (unitOfTemp == 0) {
-                mTvTemp.text = cityCollection.temp.toString() + "°C"
+                mView.tvTemp.text = cityCollection.temp.toString() + "°C"
 
             } else {
-                mTvTemp.text = getFahrenheitDegree(cityCollection.temp).toString() + "°F"
+                mView.tvTemp.text = getFahrenheitDegree(cityCollection.temp).toString() + "°F"
             }
-            mImgIcon.setImageResource(Image.getImage(
+            mView.imgIcon.setImageResource(Image.getImage(
                     cityCollection.icon,
                     cityCollection.day
             ))
-            mTvStatus.text = cityCollection.description
-            mTvHumidity.text = cityCollection.humidity.toString() + "%"
-            mTvCloud.text = cityCollection.cloud.toString() + "%"
+            mView.tvStatus.text = cityCollection.description
+            mView.tvHumidity.text = cityCollection.humidity.toString() + "%"
+            mView.tvCloud.text = cityCollection.cloud.toString() + "%"
             mCityName = cityCollection.cityName
             mDate = cityCollection.date
             mSecondDate = mDate.split(" ")[0]
@@ -131,8 +111,8 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
                 weatherRepository?.getCityHistoryWeatherBy(mCityName, this)
             }
             mRecyclerViewAdapter = RecyclerViewAdapter(mListCityWeather, unitOfTemp)
-            mRecyclerView.adapter = mRecyclerViewAdapter
-            mRecyclerView.layoutManager = LinearLayoutManager(activity)
+            mView.recyclerView.adapter = mRecyclerViewAdapter
+            mView.recyclerView.layoutManager = LinearLayoutManager(activity)
         }
     }
 
@@ -158,12 +138,12 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
         dataSet.color = Color.WHITE
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             activity?.resources?.getColor(R.color.colorGray, context?.theme)?.let { dataSet.setFill(it) }
-            activity?.resources?.getColor(R.color.colorWhite, context?.theme)?.let { mLineChartView.setLabelsColor(it) }
+            activity?.resources?.getColor(R.color.colorWhite, context?.theme)?.let { mView.lineChartView.setLabelsColor(it) }
         }
         dataSet.thickness = 1f
         if (dataSet.size() != 0) {
-            mLineChartView.addData(dataSet)
-            mLineChartView.show()
+            mView.lineChartView.addData(dataSet)
+            mView.lineChartView.show()
         }
         mCount++
         countDialog()
