@@ -30,10 +30,10 @@ import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnSelectCityLi
 
 class SearchActivity : AppCompatActivity(),
         View.OnClickListener, TextWatcher, Callback<List<City>>, OnSelectCityListener {
-    private lateinit var mToolbar: Toolbar
-    private lateinit var mImgBack: ImageView
-    private lateinit var mEdtCityName: EditText
-    private lateinit var mRecyclerView: RecyclerView
+    private lateinit var toolBarSearch: Toolbar
+    private lateinit var imgIconBack: ImageView
+    private lateinit var edtCityName: EditText
+    private lateinit var recyclerViewResultLocation: RecyclerView
     private lateinit var mCityPredictionAdapter: CityPredictionAdapter
     private lateinit var mCityApi: CityApi
     private var mListCity: MutableList<City> = mutableListOf()
@@ -50,24 +50,19 @@ class SearchActivity : AppCompatActivity(),
     }
 
     private fun initViews() {
-        val w = window
-        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-        mToolbar = findViewById(R.id.toolBarSearch)
-        mToolbar.setPadding(0, Dimen.getStatusBarHeight(this) * 3 / 2, 0, Dimen.getStatusBarHeight(this) / 2)
-        mImgBack = findViewById(R.id.imgIconBack)
-        mEdtCityName = findViewById(R.id.edtCityName)
-        mRecyclerView = findViewById(R.id.recyclerViewResultLocation)
+        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+        toolBarSearch.setPadding(0, Dimen.getStatusBarHeight(this) * 3 / 2, 0, Dimen.getStatusBarHeight(this) / 2)
     }
 
     private fun initListener() {
-        mImgBack.setOnClickListener(this)
-        mEdtCityName.addTextChangedListener(this)
+        imgIconBack.setOnClickListener(this)
+        edtCityName.addTextChangedListener(this)
     }
 
     private fun initData() {
         mCanBack = intent.getBooleanExtra(Constants.CANBACK, true)
         if (!mCanBack) {
-            mImgBack.visibility = View.INVISIBLE
+            imgIconBack.visibility = View.INVISIBLE
         }
         val sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE)
         mGranted = sharedPreferences.getBoolean(Constants.LOCATION_PERMISSION, false)
@@ -76,8 +71,8 @@ class SearchActivity : AppCompatActivity(),
             mListCity.add(mCityMyLocation)
         }
         mCityPredictionAdapter = CityPredictionAdapter(mListCity, this, this)
-        mRecyclerView.adapter = mCityPredictionAdapter
-        mRecyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerViewResultLocation.adapter = mCityPredictionAdapter
+        recyclerViewResultLocation.layoutManager = LinearLayoutManager(this)
         mCityApi = ApiCityService().getCityApi()
     }
 

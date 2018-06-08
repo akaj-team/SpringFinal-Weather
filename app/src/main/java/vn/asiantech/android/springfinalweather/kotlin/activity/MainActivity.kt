@@ -16,14 +16,9 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
@@ -41,26 +36,17 @@ import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeather
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionAsyncListener
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionChangeListener
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnInsertDoneListener
+import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnRefreshListener
 import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 
 
 class MainActivity : AppCompatActivity(),
         View.OnClickListener, OnCityCollectionAsyncListener, OnCityCollectionChangeListener,
-        DrawerLayout.DrawerListener, Callback<InformationWeather>, OnInsertDoneListener, SwipeRefreshLayout.OnRefreshListener {
-    private lateinit var mToolBar: Toolbar
-    private lateinit var mRlDrawer: RelativeLayout
-    private lateinit var mDrawerLayout: DrawerLayout
-    private lateinit var mImgMenuIcon: ImageView
-    private lateinit var mTvTitle: TextView
-    private lateinit var mTvTitleDrawer: TextView
-    private lateinit var mTvDate: TextView
-    private lateinit var mViewPager: ViewPager
+        DrawerLayout.DrawerListener, Callback<InformationWeather>, OnInsertDoneListener, OnRefreshListener {
     private lateinit var mViewPagerAdapter: ViewPagerAdapter
-    private lateinit var mTvSetting: TextView
-    private lateinit var mTvAddLocation: TextView
     private lateinit var mCityName: String
-    private lateinit var mRecyclerView: RecyclerView
     private lateinit var mCityCollectionAdapter: CityCollectionAdapter
+    private var mSwipeRefresh: SwipeRefreshLayout? = null
     private var mListCityCollection: MutableList<CityCollection> = mutableListOf()
     private var mFocusName: String = ""
     private var mIsNewData = false
@@ -144,22 +130,10 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun initViews() {
-        val w = window
-        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-        mToolBar = findViewById(R.id.toolBar)
-        mToolBar.setPadding(0, Dimen.getStatusBarHeight(this), 0, Dimen.getStatusBarHeight(this))
-        mViewPager = findViewById(R.id.viewPager)
-        mDrawerLayout = findViewById(R.id.drawerLayout)
-        mImgMenuIcon = findViewById(R.id.imgMenuIcon)
-        mTvTitle = findViewById(R.id.tvTitle)
-        mTvTitleDrawer = findViewById(R.id.tvTitleDrawer)
-        mTvTitleDrawer.setPadding(50, Dimen.getStatusBarHeight(this), 0, Dimen.getStatusBarHeight(this) / 2)
-        mTvDate = findViewById(R.id.tvDate)
-        mTvSetting = findViewById(R.id.tvSetting)
-        mRlDrawer = findViewById(R.id.rlDrawer)
-        mRlDrawer.setPadding(0, 0, 0, Dimen.getNavigationBarHeight(this))
-        mTvAddLocation = findViewById(R.id.tvAddLocation)
-        mRecyclerView = findViewById(R.id.recyclerViewLocation)
+        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+        toolBar.setPadding(0, Dimen.getStatusBarHeight(this), 0, Dimen.getStatusBarHeight(this))
+        tvTitleDrawer.setPadding(50, Dimen.getStatusBarHeight(this), 0, Dimen.getStatusBarHeight(this) / 2)
+        rlDrawer.setPadding(0, 0, 0, Dimen.getNavigationBarHeight(this))
         mDialogLoading = Dialog(this, R.style.Dialog)
         mDialogLoading.setContentView(R.layout.dialog_waiting)
         mDialogLoading.setCanceledOnTouchOutside(false)
@@ -168,7 +142,7 @@ class MainActivity : AppCompatActivity(),
 
     private fun reloadViewPager() {
         mViewPagerAdapter.notifyDataSetChanged()
-        mViewPager.offscreenPageLimit = mListCityCollection.size
+        viewPager.offscreenPageLimit = mListCityCollection.size
     }
 
     private fun reloadListCityCollection() {
@@ -183,10 +157,10 @@ class MainActivity : AppCompatActivity(),
                 this,
                 sharedPreferences.getInt(Constants.UNIT_OF_TEMP, 0)
         )
-        mRecyclerView.adapter = mCityCollectionAdapter
-        mRecyclerView.layoutManager = LinearLayoutManager(this)
-        mViewPagerAdapter = ViewPagerAdapter(supportFragmentManager, mListCityCollection)
-        mViewPager.adapter = mViewPagerAdapter
+        recyclerViewLocation.adapter = mCityCollectionAdapter
+        recyclerViewLocation.layoutManager = LinearLayoutManager(this)
+        mViewPagerAdapter = ViewPagerAdapter(supportFragmentManager, mListCityCollection, this)
+        viewPager.adapter = mViewPagerAdapter
     }
 
     private fun initDataFromDatabase() {
@@ -197,12 +171,11 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun initListener() {
-        mDrawerLayout.addDrawerListener(this)
-        mImgMenuIcon.setOnClickListener(this)
-        mTvSetting.setOnClickListener(this)
-        mTvAddLocation.setOnClickListener(this)
-        swipeRefreshLayout.setOnRefreshListener(this)
-        mViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+        drawerLayout.addDrawerListener(this)
+        imgMenuIcon.setOnClickListener(this)
+        tvSetting.setOnClickListener(this)
+        tvAddLocation.setOnClickListener(this)
+        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
             }
 
@@ -212,9 +185,9 @@ class MainActivity : AppCompatActivity(),
             @SuppressLint("SetTextI18n")
             override fun onPageSelected(position: Int) {
                 mFocusName = mListCityCollection[position].cityName
-                mTvTitle.text = "$mFocusName, ${mListCityCollection[position].countryName}"
-                mTvDate.text = Dimen.getDate(mListCityCollection[position].date)
-                mDrawerLayout.setBackgroundResource(Image.getBackground(
+                tvTitle.text = "$mFocusName, ${mListCityCollection[position].countryName}"
+                tvDate.text = Dimen.getDate(mListCityCollection[position].date)
+                drawerLayout.setBackgroundResource(Image.getBackground(
                         mListCityCollection[position].icon,
                         mListCityCollection[position].day
                 ))
@@ -222,21 +195,22 @@ class MainActivity : AppCompatActivity(),
         })
     }
 
-    override fun onRefresh() {
+    override fun onRefresh(cityName: String, swipeRefreshLayout: SwipeRefreshLayout) {
+        mSwipeRefresh = swipeRefreshLayout
         if (isOnline()) {
-            mFocusName = mListCityCollection[mViewPager.currentItem].cityName
+            mFocusName = cityName
             val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
             editor.putString(Constants.FOCUS_POSITION, mFocusName)
             editor.apply()
             loadInformationWeather(mFocusName)
         } else {
-            swipeRefreshLayout.isRefreshing = false
+            mSwipeRefresh?.isRefreshing = false
         }
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.imgMenuIcon -> mDrawerLayout.openDrawer(Gravity.LEFT)
+            R.id.imgMenuIcon -> drawerLayout.openDrawer(Gravity.LEFT)
             R.id.tvSetting -> goTo(SettingActivity::class.java)
             R.id.tvAddLocation -> goTo(SearchActivity::class.java)
         }
@@ -278,10 +252,10 @@ class MainActivity : AppCompatActivity(),
                 mFocusName = listCityCollection[0].cityName
             }
             reloadViewPager()
-            mViewPager.currentItem = index
-            mTvTitle.text = "$mFocusName, ${mListCityCollection[index].countryName}"
-            mTvDate.text = Dimen.getDate(mListCityCollection[index].date)
-            mDrawerLayout.setBackgroundResource(Image.getBackground(
+            viewPager.currentItem = index
+            tvTitle.text = "$mFocusName, ${mListCityCollection[index].countryName}"
+            tvDate.text = Dimen.getDate(mListCityCollection[index].date)
+            drawerLayout.setBackgroundResource(Image.getBackground(
                     mListCityCollection[index].icon,
                     mListCityCollection[index].day
             ))
@@ -300,7 +274,7 @@ class MainActivity : AppCompatActivity(),
         }
         reloadListCityCollection()
         mDialogLoading.dismiss()
-        swipeRefreshLayout.isRefreshing = false
+        mSwipeRefresh?.isRefreshing = false
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -351,18 +325,18 @@ class MainActivity : AppCompatActivity(),
             if (cityCollection.cityName == mFocusName) {
                 mListCityCollection.remove(cityCollection)
                 reloadViewPager()
-                mViewPager.currentItem = 0
+                viewPager.currentItem = 0
                 mFocusName = mListCityCollection[0].cityName
-                mTvTitle.text = "$mFocusName, ${mListCityCollection[0].countryName}"
-                mTvDate.text = Dimen.getDate(mListCityCollection[0].date)
-                mDrawerLayout.setBackgroundResource(Image.getBackground(
+                tvTitle.text = "$mFocusName, ${mListCityCollection[0].countryName}"
+                tvDate.text = Dimen.getDate(mListCityCollection[0].date)
+                drawerLayout.setBackgroundResource(Image.getBackground(
                         mListCityCollection[0].icon,
                         mListCityCollection[0].day
                 ))
                 reloadListCityCollection()
             } else {
-                if (mViewPager.currentItem > mListCityCollection.indexOf(cityCollection)) {
-                    mViewPager.currentItem = mListCityCollection.indexOf(cityCollection) + 1
+                if (viewPager.currentItem > mListCityCollection.indexOf(cityCollection)) {
+                    viewPager.currentItem = mListCityCollection.indexOf(cityCollection) + 1
                 }
                 mListCityCollection.remove(cityCollection)
                 reloadListCityCollection()
@@ -378,7 +352,7 @@ class MainActivity : AppCompatActivity(),
 
     override fun onChangeShowCityCollection(cityCollection: CityCollection) {
         mFocusName = cityCollection.cityName
-        mViewPager.currentItem = mListCityCollection.indexOf(cityCollection)
+        viewPager.currentItem = mListCityCollection.indexOf(cityCollection)
     }
 
     override fun onDrawerStateChanged(newState: Int) {
@@ -395,7 +369,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun loadInformationWeather(cityName: String) {
-        if (!swipeRefreshLayout.isRefreshing) {
+        if (mSwipeRefresh == null) {
             mDialogLoading.show()
         }
         val apiServices = ApiCityService()
@@ -410,12 +384,14 @@ class MainActivity : AppCompatActivity(),
         } else {
             Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
             mDialogLoading.dismiss()
+            mSwipeRefresh?.isRefreshing = false
         }
     }
 
     override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
         Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
         mDialogLoading.dismiss()
+        mSwipeRefresh?.isRefreshing = false
     }
 
     private fun saveNewCityCollection(informationWeather: InformationWeather, state: Boolean = Constants.OTHER_LOCATION) {

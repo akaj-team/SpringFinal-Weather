@@ -10,16 +10,7 @@ class Constants {
 
         //const for intent key
         const val CITY_NAME = "city_name"
-        const val DATE = "date"
-        const val COUNTRY_NAME = "country_name"
-        const val TEMP = "temp"
-        const val APP_TEMP = "app_temp"
-        const val HUMIDITY = "humidity"
-        const val WIND = "wind"
-        const val CLOUD = "cloud"
-        const val DESCRIPTION = "description"
-        const val ICON = "icon"
-        const val IS_DAY = "is_day"
+        const val CITY_COLLECTION = "city_colection"
         const val CANBACK = "can_back"
         const val FINDLOCATION = "find_location"
 
