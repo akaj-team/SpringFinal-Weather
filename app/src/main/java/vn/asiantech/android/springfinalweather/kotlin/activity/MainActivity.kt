@@ -25,7 +25,6 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
-import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -41,12 +40,13 @@ import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeather
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionAsyncListener
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionChangeListener
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnInsertDoneListener
+import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnRefreshListener
 import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 
 
 class MainActivity : AppCompatActivity(),
         View.OnClickListener, OnCityCollectionAsyncListener, OnCityCollectionChangeListener,
-        DrawerLayout.DrawerListener, Callback<InformationWeather>, OnInsertDoneListener, SwipeRefreshLayout.OnRefreshListener {
+        DrawerLayout.DrawerListener, Callback<InformationWeather>, OnInsertDoneListener, OnRefreshListener {
     private lateinit var mToolBar: Toolbar
     private lateinit var mRlDrawer: RelativeLayout
     private lateinit var mDrawerLayout: DrawerLayout
@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mCityName: String
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mCityCollectionAdapter: CityCollectionAdapter
+    private var mSwipeRefresh: SwipeRefreshLayout? = null
     private var mListCityCollection: MutableList<CityCollection> = mutableListOf()
     private var mFocusName: String = ""
     private var mIsNewData = false
@@ -185,7 +186,7 @@ class MainActivity : AppCompatActivity(),
         )
         mRecyclerView.adapter = mCityCollectionAdapter
         mRecyclerView.layoutManager = LinearLayoutManager(this)
-        mViewPagerAdapter = ViewPagerAdapter(supportFragmentManager, mListCityCollection)
+        mViewPagerAdapter = ViewPagerAdapter(supportFragmentManager, mListCityCollection, this)
         mViewPager.adapter = mViewPagerAdapter
     }
 
@@ -201,7 +202,6 @@ class MainActivity : AppCompatActivity(),
         mImgMenuIcon.setOnClickListener(this)
         mTvSetting.setOnClickListener(this)
         mTvAddLocation.setOnClickListener(this)
-        swipeRefreshLayout.setOnRefreshListener(this)
         mViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
             }
@@ -222,15 +222,16 @@ class MainActivity : AppCompatActivity(),
         })
     }
 
-    override fun onRefresh() {
+    override fun onRefresh(cityName: String, swipeRefreshLayout: SwipeRefreshLayout) {
+        mSwipeRefresh = swipeRefreshLayout
         if (isOnline()) {
-            mFocusName = mListCityCollection[mViewPager.currentItem].cityName
+            mFocusName = cityName
             val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
             editor.putString(Constants.FOCUS_POSITION, mFocusName)
             editor.apply()
             loadInformationWeather(mFocusName)
         } else {
-            swipeRefreshLayout.isRefreshing = false
+            mSwipeRefresh?.isRefreshing = false
         }
     }
 
@@ -300,7 +301,7 @@ class MainActivity : AppCompatActivity(),
         }
         reloadListCityCollection()
         mDialogLoading.dismiss()
-        swipeRefreshLayout.isRefreshing = false
+        mSwipeRefresh?.isRefreshing = false
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -395,7 +396,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun loadInformationWeather(cityName: String) {
-        if (!swipeRefreshLayout.isRefreshing) {
+        if (mSwipeRefresh == null) {
             mDialogLoading.show()
         }
         val apiServices = ApiCityService()
@@ -410,12 +411,14 @@ class MainActivity : AppCompatActivity(),
         } else {
             Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
             mDialogLoading.dismiss()
+            mSwipeRefresh?.isRefreshing = false
         }
     }
 
     override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
         Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
         mDialogLoading.dismiss()
+        mSwipeRefresh?.isRefreshing = false
     }
 
     private fun saveNewCityCollection(informationWeather: InformationWeather, state: Boolean = Constants.OTHER_LOCATION) {

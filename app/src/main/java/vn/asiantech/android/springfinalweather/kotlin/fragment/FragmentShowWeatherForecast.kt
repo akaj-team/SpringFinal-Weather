@@ -19,6 +19,7 @@ import android.widget.TextView
 import com.db.chart.model.LineSet
 import com.db.chart.model.Point
 import com.db.chart.view.LineChartView
+import kotlinx.android.synthetic.main.fragment_show_weather_forecast.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,13 +28,11 @@ import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Image
 import vn.asiantech.android.springfinalweather.kotlin.adapter.RecyclerViewAdapter
 import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiCityService
-import vn.asiantech.android.springfinalweather.kotlin.model.CityHistoryWeather
-import vn.asiantech.android.springfinalweather.kotlin.model.CityWeather
-import vn.asiantech.android.springfinalweather.kotlin.model.HistoryInformationWeather
-import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeatherRecyclerView
+import vn.asiantech.android.springfinalweather.kotlin.model.*
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityHistoryWeatherAsyncListener
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityWeatherAsyncListener
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnLoadListHistoryWeather
+import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnRefreshListener
 import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 
 class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCityHistoryWeatherAsyncListener, OnLoadListHistoryWeather {
@@ -56,10 +55,16 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
     private var mIsNewData = false
     private var mCount = 0
     private lateinit var mDialogLoading: Dialog
+    private var mListener: OnRefreshListener? = null
+
+    fun setListener(listener: OnRefreshListener) {
+        mListener = listener
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_show_weather_forecast, container, false)
         initViews(view)
+        initListener(view)
         initData()
         return view
     }
@@ -79,34 +84,41 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
         mDialogLoading.setCancelable(true)
     }
 
+    private fun initListener(view: View) {
+        view.swipeRefresh.setOnRefreshListener {
+            mListener?.onRefresh(mCityName, view.swipeRefresh)
+        }
+    }
+
     @SuppressLint("SetTextI18n")
     private fun initData() {
         val bundle = arguments
         if (bundle != null) {
+            val cityCollection: CityCollection = bundle.getParcelable(Constants.CITY_COLLECTION)
             mSharedPreferences = activity?.getSharedPreferences(
                     getString(R.string.shared_preference_name),
                     Context.MODE_PRIVATE)
             if (mSharedPreferences?.getInt(Constants.UNIT_OF_WIND_SPEED, 0) == 0) {
-                mTvWind.text = bundle.getFloat(Constants.WIND).toString() + " km/h"
+                mTvWind.text = cityCollection.wind.toString() + " km/h"
             } else {
-                mTvWind.text = getMetrePerSecond(bundle.getFloat(Constants.WIND)).toString() + " m/s"
+                mTvWind.text = getMetrePerSecond(cityCollection.wind).toString() + " m/s"
             }
             val unitOfTemp = mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0)
             if (unitOfTemp == 0) {
-                mTvTemp.text = bundle.getFloat(Constants.TEMP).toString() + "°C"
+                mTvTemp.text = cityCollection.temp.toString() + "°C"
 
             } else {
-                mTvTemp.text = getFahrenheitDegree(bundle.getFloat(Constants.TEMP)).toString() + "°F"
+                mTvTemp.text = getFahrenheitDegree(cityCollection.temp).toString() + "°F"
             }
             mImgIcon.setImageResource(Image.getImage(
-                    bundle.getString(Constants.ICON),
-                    bundle.getInt(Constants.IS_DAY)
+                    cityCollection.icon,
+                    cityCollection.day
             ))
-            mTvStatus.text = bundle.getString(Constants.DESCRIPTION)
-            mTvHumidity.text = bundle.getInt(Constants.HUMIDITY).toString() + "%"
-            mTvCloud.text = bundle.getInt(Constants.CLOUD).toString() + "%"
-            mCityName = bundle.getString(Constants.CITY_NAME)
-            mDate = bundle.getString(Constants.DATE)
+            mTvStatus.text = cityCollection.description
+            mTvHumidity.text = cityCollection.humidity.toString() + "%"
+            mTvCloud.text = cityCollection.cloud.toString() + "%"
+            mCityName = cityCollection.cityName
+            mDate = cityCollection.date
             mSecondDate = mDate.split(" ")[0]
             mDialogLoading.show()
             val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
