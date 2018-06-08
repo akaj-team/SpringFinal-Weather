@@ -30,19 +30,21 @@ import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityWeatherA
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnLoadListHistoryWeather
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnRefreshListener
 import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
+import java.text.DecimalFormat
 
 class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCityHistoryWeatherAsyncListener, OnLoadListHistoryWeather {
-    private var mSharedPreferences: SharedPreferences? = null
+
     private lateinit var mRecyclerViewAdapter: RecyclerViewAdapter
-    private lateinit var mView: View
-    private var mListCityWeather: MutableList<CityWeather> = mutableListOf()
-    private var mListCityHistoryWeather: MutableList<CityHistoryWeather> = mutableListOf()
+    private lateinit var mDialogLoading: Dialog
     private lateinit var mCityName: String
     private lateinit var mDate: String
     private lateinit var mSecondDate: String
+    private lateinit var mView: View
+    private var mSharedPreferences: SharedPreferences? = null
+    private var mListCityWeather: MutableList<CityWeather> = mutableListOf()
+    private var mListCityHistoryWeather: MutableList<CityHistoryWeather> = mutableListOf()
     private var mIsNewData = false
     private var mCount = 0
-    private lateinit var mDialogLoading: Dialog
     private var mListener: OnRefreshListener? = null
 
     fun setListener(listener: OnRefreshListener) {
@@ -132,16 +134,25 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
 
     override fun onLoadCityHistoryWeatherList(listCityHistoryWeather: List<CityHistoryWeather>) {
         val dataSet = LineSet()
+        val decimalFormat = DecimalFormat("0")
         listCityHistoryWeather.forEach {
-            dataSet.addPoint(Point(it.time.split(" ")[1].split(":")[0], it.tempC))
+            val tempC = it.tempC
+            val split = it.time.split(" ")[1].split(":")[0][0].toString()
+            val time = if (split == "0") {
+                it.time.split(" ")[1].split(":")[0][1].toString()
+            } else {
+                it.time.split(" ")[1].split(":")[0]
+            }
+            dataSet.addPoint(Point(time, tempC))
         }
-        dataSet.color = Color.WHITE
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            activity?.resources?.getColor(R.color.colorGray, context?.theme)?.let { dataSet.setFill(it) }
             activity?.resources?.getColor(R.color.colorWhite, context?.theme)?.let { mView.lineChartView.setLabelsColor(it) }
         }
-        dataSet.thickness = 1f
+        dataSet.color = Color.WHITE
+        dataSet.thickness = 8f
+        dataSet.setDotsRadius(5f)
         if (dataSet.size() != 0) {
+            mView.lineChartView.setLabelsFormat(decimalFormat)
             mView.lineChartView.addData(dataSet)
             mView.lineChartView.show()
         }

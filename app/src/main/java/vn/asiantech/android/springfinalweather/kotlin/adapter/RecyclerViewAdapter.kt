@@ -37,11 +37,11 @@ class RecyclerViewAdapter(private val mListCityWeather: List<CityWeather>, priva
         fun bind(cityWeather: CityWeather) {
             mTvDate.text = Dimen.getDateFormat(cityWeather.date)
             if (unitOfTemp == 0) {
-                mTvMaxTempList.text = cityWeather.tempMin.toString() + "°C"
-                mTvMinTempList.text = "/ " + cityWeather.tempMax.toString() + "°C"
+                mTvMaxTempList.text = cityWeather.tempMin.toInt().toString() + "°C"
+                mTvMinTempList.text = "/ " + cityWeather.tempMax.toInt().toString() + "°C"
             } else {
-                mTvMaxTempList.text = getFahrenheitDegree(cityWeather.tempMin).toString() + "°F"
-                mTvMinTempList.text = "/ " + getFahrenheitDegree(cityWeather.tempMax).toString() + "°F"
+                mTvMaxTempList.text = getFahrenheitDegree(cityWeather.tempMin).toInt().toString() + "°F"
+                mTvMinTempList.text = "/ " + getFahrenheitDegree(cityWeather.tempMax).toInt().toString() + "°F"
             }
             val icon = cityWeather.icon
             mImgIconDate.setImageResource(Image.getIcon(icon, 1))

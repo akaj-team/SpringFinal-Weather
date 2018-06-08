@@ -91,7 +91,9 @@
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_below="@+id/recyclerView"
-            android:layout_marginTop="10dp" />
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp">
+
+        </com.db.chart.view.LineChartView>
     </RelativeLayout>
 </android.support.v4.widget.SwipeRefreshLayout>
-
