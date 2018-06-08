@@ -52,7 +52,6 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
     private lateinit var mDate: String
     private lateinit var mSecondDate: String
     private lateinit var mDialogLoading: Dialog
-    private lateinit var mTime: String
     private var mSharedPreferences: SharedPreferences? = null
     private var mListCityWeather: MutableList<CityWeather> = mutableListOf()
     private var mListCityHistoryWeather: MutableList<CityHistoryWeather> = mutableListOf()
@@ -146,12 +145,12 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
         listCityHistoryWeather.forEach {
             val tempC = it.tempC
             val split = it.time.split(" ")[1].split(":")[0][0].toString()
-            mTime = if (split == "0") {
+            val time = if (split == "0") {
                 it.time.split(" ")[1].split(":")[0][1].toString()
             } else {
                 it.time.split(" ")[1].split(":")[0]
             }
-            dataSet.addPoint(Point(mTime, tempC))
+            dataSet.addPoint(Point(time, tempC))
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             activity?.resources?.getColor(R.color.colorBlue, context?.theme)?.let { dataSet.setDotsColor(it) }
@@ -161,6 +160,7 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
         dataSet.isSmooth = true
         dataSet.thickness = 8f
         dataSet.setDotsRadius(5f)
+        dataSet.setGradientFill(intArrayOf(Color.parseColor("#b1adad"), R.color.colorGray), null)
         if (dataSet.size() != 0) {
             mLineChartView.setLabelsFormat(decimalFormat)
             mLineChartView.addData(dataSet)
@@ -169,7 +169,6 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
         mCount++
         countDialog()
     }
-
 
     private fun loadListWeatherFourDay(cityName: String) {
         val apiServicesRecyclerView = ApiCityService()
