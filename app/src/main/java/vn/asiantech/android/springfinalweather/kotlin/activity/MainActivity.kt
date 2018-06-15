@@ -13,7 +13,6 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
-import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Gravity
@@ -36,17 +35,15 @@ import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeather
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionAsyncListener
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionChangeListener
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnInsertDoneListener
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnRefreshListener
 import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 
 
 class MainActivity : AppCompatActivity(),
         View.OnClickListener, OnCityCollectionAsyncListener, OnCityCollectionChangeListener,
-        DrawerLayout.DrawerListener, Callback<InformationWeather>, OnInsertDoneListener, OnRefreshListener {
+        DrawerLayout.DrawerListener, Callback<InformationWeather>, OnInsertDoneListener {
     private lateinit var mViewPagerAdapter: ViewPagerAdapter
     private lateinit var mCityName: String
     private lateinit var mCityCollectionAdapter: CityCollectionAdapter
-    private var mSwipeRefresh: SwipeRefreshLayout? = null
     private var mListCityCollection: MutableList<CityCollection> = mutableListOf()
     private var mFocusName: String = ""
     private var mIsNewData = false
@@ -86,9 +83,7 @@ class MainActivity : AppCompatActivity(),
     private fun checkLocationPermission() {
         mDialogLoading.show()
         val granted = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
-        editor.putBoolean(Constants.LOCATION_PERMISSION, granted)
-        editor.apply()
+        setGranted(granted)
         if (granted) {
             val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val providers = locationManager.getProviders(true)
@@ -119,19 +114,27 @@ class MainActivity : AppCompatActivity(),
 
                             override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
                                 Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
+                                setGranted(false)
                                 mDialogLoading.dismiss()
                             }
                         })
             } else {
                 Toast.makeText(this, R.string.city_not_found, Toast.LENGTH_SHORT).show()
-                goTo(SearchActivity::class.java)
+                setGranted(false)
+                initDataFromDatabase()
             }
         }
     }
 
+    private fun setGranted(granted: Boolean) {
+        val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
+        editor.putBoolean(Constants.LOCATION_PERMISSION, granted)
+        editor.apply()
+    }
+
     private fun initViews() {
         window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-        toolBar.setPadding(0, Dimen.getStatusBarHeight(this), 0, Dimen.getStatusBarHeight(this))
+        toolBar.setPadding(0, Dimen.getStatusBarHeight(this), 0, 0)
         tvTitleDrawer.setPadding(50, Dimen.getStatusBarHeight(this), 0, Dimen.getStatusBarHeight(this) / 2)
         rlDrawer.setPadding(0, 0, 0, Dimen.getNavigationBarHeight(this))
         mDialogLoading = Dialog(this, R.style.Dialog)
@@ -159,7 +162,7 @@ class MainActivity : AppCompatActivity(),
         )
         recyclerViewLocation.adapter = mCityCollectionAdapter
         recyclerViewLocation.layoutManager = LinearLayoutManager(this)
-        mViewPagerAdapter = ViewPagerAdapter(supportFragmentManager, mListCityCollection, this)
+        mViewPagerAdapter = ViewPagerAdapter(supportFragmentManager, mListCityCollection)
         viewPager.adapter = mViewPagerAdapter
     }
 
@@ -193,19 +196,7 @@ class MainActivity : AppCompatActivity(),
                 ))
             }
         })
-    }
-
-    override fun onRefresh(cityName: String, swipeRefreshLayout: SwipeRefreshLayout) {
-        mSwipeRefresh = swipeRefreshLayout
-        if (isOnline()) {
-            mFocusName = cityName
-            val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
-            editor.putString(Constants.FOCUS_POSITION, mFocusName)
-            editor.apply()
-            loadInformationWeather(mFocusName)
-        } else {
-            mSwipeRefresh?.isRefreshing = false
-        }
+        imgRefresh.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
@@ -213,6 +204,17 @@ class MainActivity : AppCompatActivity(),
             R.id.imgMenuIcon -> drawerLayout.openDrawer(Gravity.LEFT)
             R.id.tvSetting -> goTo(SettingActivity::class.java)
             R.id.tvAddLocation -> goTo(SearchActivity::class.java)
+            R.id.imgRefresh -> {
+                if (isOnline()) {
+                    mFocusName = mListCityCollection[viewPager.currentItem].cityName
+                    val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
+                    editor.putString(Constants.FOCUS_POSITION, mFocusName)
+                    editor.apply()
+                    loadInformationWeather(mFocusName)
+                } else {
+                    Toast.makeText(this, R.string.connect_fail, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -274,7 +276,6 @@ class MainActivity : AppCompatActivity(),
         }
         reloadListCityCollection()
         mDialogLoading.dismiss()
-        mSwipeRefresh?.isRefreshing = false
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -369,9 +370,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun loadInformationWeather(cityName: String) {
-        if (mSwipeRefresh == null) {
-            mDialogLoading.show()
-        }
+        mDialogLoading.show()
         val apiServices = ApiCityService()
         apiServices.getCityApi().getCurrentWeather(cityName).enqueue(this)
     }
@@ -384,14 +383,13 @@ class MainActivity : AppCompatActivity(),
         } else {
             Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
             mDialogLoading.dismiss()
-            mSwipeRefresh?.isRefreshing = false
         }
     }
 
     override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
         Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
+        initDataFromDatabase()
         mDialogLoading.dismiss()
-        mSwipeRefresh?.isRefreshing = false
     }
 
     private fun saveNewCityCollection(informationWeather: InformationWeather, state: Boolean = Constants.OTHER_LOCATION) {

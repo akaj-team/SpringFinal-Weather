@@ -1,5 +1,6 @@
 package vn.asiantech.android.springfinalweather.kotlin.fragment
 
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
@@ -8,14 +9,19 @@ import android.graphics.Color
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
+import android.support.constraint.ConstraintSet
+import android.support.transition.ChangeBounds
+import android.support.transition.ChangeImageTransform
+import android.support.transition.TransitionManager
+import android.support.transition.TransitionSet
 import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.TextView
 import com.db.chart.model.LineSet
 import com.db.chart.model.Point
-import kotlinx.android.synthetic.main.fragment_show_weather_forecast.view.*
+import kotlinx.android.synthetic.main.fragment_weather_expand.*
+import kotlinx.android.synthetic.main.fragment_weather_expand.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,16 +30,16 @@ import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Image
 import vn.asiantech.android.springfinalweather.kotlin.adapter.RecyclerViewAdapter
 import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiCityService
+import vn.asiantech.android.springfinalweather.kotlin.layoutmanager.LinearLayoutDisableScroll
 import vn.asiantech.android.springfinalweather.kotlin.model.*
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityHistoryWeatherAsyncListener
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityWeatherAsyncListener
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnLoadListHistoryWeather
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnRefreshListener
 import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 import java.text.DecimalFormat
 
-class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCityHistoryWeatherAsyncListener, OnLoadListHistoryWeather {
-
+class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener,
+        OnCityHistoryWeatherAsyncListener, OnLoadListHistoryWeather {
     private lateinit var mRecyclerViewAdapter: RecyclerViewAdapter
     private lateinit var mDialogLoading: Dialog
     private lateinit var mCityName: String
@@ -45,14 +51,10 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
     private var mListCityHistoryWeather: MutableList<CityHistoryWeather> = mutableListOf()
     private var mIsNewData = false
     private var mCount = 0
-    private var mListener: OnRefreshListener? = null
-
-    fun setListener(listener: OnRefreshListener) {
-        mListener = listener
-    }
+    private var mIsCollapse = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mView = inflater.inflate(R.layout.fragment_show_weather_forecast, container, false)
+        mView = inflater.inflate(R.layout.fragment_weather_expand, container, false)
         initViews()
         initListener()
         initData()
@@ -67,9 +69,49 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
     }
 
     private fun initListener() {
-        mView.swipeRefresh.setOnRefreshListener {
-            mListener?.onRefresh(mCityName, mView.swipeRefresh)
+        val collapse = ConstraintSet()
+        val expanded = ConstraintSet()
+        val transition = TransitionSet()
+        transition.addTransition(ChangeBounds())
+        transition.addTransition(ChangeImageTransform())
+        transition.interpolator = AccelerateDecelerateInterpolator()
+        collapse.clone(activity, R.layout.fragment_weather_collapse)
+        expanded.clone(mView.clContent)
+        val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                if (e2.y > e1.y) {
+                    if (mIsCollapse) {
+                        TransitionManager.beginDelayedTransition(clContent, transition)
+                        changeTextSize(tvTemp, 35f, 45f)
+                        changeTextSize(tvWind, 12f, 15f)
+                        changeTextSize(tvCloud, 12f, 15f)
+                        changeTextSize(tvHumidity, 12f, 15f)
+                        changeTextSize(tvStatus, 16f, 25f)
+                        expanded.applyTo(clContent)
+                        mIsCollapse = false
+                    }
+                } else {
+                    if (!mIsCollapse) {
+                        TransitionManager.beginDelayedTransition(clContent, transition)
+                        changeTextSize(tvTemp, 45f, 35f)
+                        changeTextSize(tvWind, 15f, 12f)
+                        changeTextSize(tvCloud, 15f, 12f)
+                        changeTextSize(tvHumidity, 15f, 12f)
+                        changeTextSize(tvStatus, 25f, 16f)
+                        collapse.applyTo(clContent)
+                        mIsCollapse = true
+                    }
+                }
+                return true
+            }
+        })
+        mView.clContent.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
         }
+    }
+
+    private fun changeTextSize(view: TextView, from: Float, to: Float) {
+        ObjectAnimator.ofFloat(view, "textSize", from, to).setDuration(1000).start()
     }
 
     @SuppressLint("SetTextI18n")
@@ -81,14 +123,13 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
                     getString(R.string.shared_preference_name),
                     Context.MODE_PRIVATE)
             if (mSharedPreferences?.getInt(Constants.UNIT_OF_WIND_SPEED, 0) == 0) {
-                mView.tvWind.text = cityCollection.wind.toString() + " km/h"
+                mView.tvWind.text = cityCollection.wind.toInt().toString() + " km/h"
             } else {
                 mView.tvWind.text = getMetrePerSecond(cityCollection.wind).toString() + " m/s"
             }
             val unitOfTemp = mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0)
             if (unitOfTemp == 0) {
-                mView.tvTemp.text = cityCollection.temp.toString() + "°C"
-
+                mView.tvTemp.text = cityCollection.temp.toInt().toString() + "°C"
             } else {
                 mView.tvTemp.text = getFahrenheitDegree(cityCollection.temp).toString() + "°F"
             }
@@ -114,7 +155,7 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
             }
             mRecyclerViewAdapter = RecyclerViewAdapter(mListCityWeather, unitOfTemp)
             mView.recyclerView.adapter = mRecyclerViewAdapter
-            mView.recyclerView.layoutManager = LinearLayoutManager(activity)
+            mView.recyclerView.layoutManager = LinearLayoutDisableScroll(context)
         }
     }
 
@@ -233,16 +274,14 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener, OnCi
         weatherRepository?.getCityHistoryWeatherBy(mCityName, this)
     }
 
-    private fun getMetrePerSecond(speed: Float): Float {
+    private fun getMetrePerSecond(speed: Float): Int {
         val metre = speed * 5 / 18
-        val result = Math.round(metre.times(10)) / 10.0
-        return result.toFloat()
+        return metre.toInt()
     }
 
-    private fun getFahrenheitDegree(fah: Float): Float {
+    private fun getFahrenheitDegree(fah: Float): Int {
         val fahrenheit = fah.times(9).div(5) + 32
-        val result = Math.round(fahrenheit.times(10)) / 10.0
-        return result.toFloat()
+        return fahrenheit.toInt()
     }
 
     private fun isOnline(): Boolean {

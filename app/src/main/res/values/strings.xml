@@ -1,11 +1,7 @@
 <resources>
     <string name="app_name">WeatherHDUncen</string>
     <string name="current_day">Current Day</string>
-    <string name="temp">78°C</string>
     <string name="status">Heavy rain</string>
-    <string name="humidity">70%</string>
-    <string name="cloud">50%</string>
-    <string name="wind">80%</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
     <string name="date">Date</string>
@@ -31,4 +27,5 @@
     <string name="get_my_location">Get Your Location</string>
     <string name="sun_status">53%</string>
     <string name="your_location">Your City</string>
+    <string name="custom_behavior">vn.asiantech.android.springfinalweather.kotlin.behavior.ImageWeatherBehavior</string>
 </resources>
