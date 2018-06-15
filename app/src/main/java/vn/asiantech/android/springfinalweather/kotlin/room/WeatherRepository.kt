@@ -11,56 +11,56 @@ import vn.asiantech.android.springfinalweather.kotlin.model.CityWeather
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.*
 
 class WeatherRepository(context: Context) {
-    private lateinit var mCityWeatherDao: CityWeatherDao
-    private lateinit var mCityCollectionDao: CityCollectionDao
-    private lateinit var mCityHistoryWeatherDao: CityHistoryWeatherDao
+    private lateinit var cityWeatherDao: CityWeatherDao
+    private lateinit var cityCollectionDao: CityCollectionDao
+    private lateinit var cityHistoryWeatherDao: CityHistoryWeatherDao
 
     init {
         val weatherDatabase = WeatherDatabaseRoom.getWeatherDatabase(context)
         if (weatherDatabase != null) {
-            mCityWeatherDao = weatherDatabase.cityWeatherDao()
-            mCityHistoryWeatherDao = weatherDatabase.cityHistoryWeatherDao()
-            mCityCollectionDao = weatherDatabase.cityCollectionDao()
+            cityWeatherDao = weatherDatabase.cityWeatherDao()
+            cityHistoryWeatherDao = weatherDatabase.cityHistoryWeatherDao()
+            cityCollectionDao = weatherDatabase.cityCollectionDao()
         }
     }
 
     fun getAllCityCollection(listener: OnCityCollectionAsyncListener) {
-        GetAllCityCollectionAsyncTask(mCityCollectionDao, listener).execute()
+        GetAllCityCollectionAsyncTask(cityCollectionDao, listener).execute()
     }
 
     fun insert(cityCollection: CityCollection, listener: OnInsertDoneListener) {
-        InsertCityCollectionAsyncTask(mCityCollectionDao, listener).execute(cityCollection)
+        InsertCityCollectionAsyncTask(cityCollectionDao, listener).execute(cityCollection)
     }
 
     fun delete(cityCollection: CityCollection) {
-        DeleteCityCollectionAsyncTask(mCityCollectionDao, mCityWeatherDao, mCityHistoryWeatherDao).execute(cityCollection)
+        DeleteCityCollectionAsyncTask(cityCollectionDao, cityWeatherDao, cityHistoryWeatherDao).execute(cityCollection)
     }
 
     fun deleteLocation() {
-        DeleteUserLocationAsyncTask(mCityCollectionDao).execute()
+        DeleteUserLocationAsyncTask(cityCollectionDao).execute()
     }
 
     fun getCityWeatherBy(cityName: String, listener: OnCityWeatherAsyncListener) {
-        GetAllCityWeatherAsyncTask(mCityWeatherDao, listener, cityName).execute()
+        GetAllCityWeatherAsyncTask(cityWeatherDao, listener, cityName).execute()
     }
 
     fun insert(cityWeather: CityWeather) {
-        InsertCityWeatherAsyncTask(mCityWeatherDao).execute(cityWeather)
+        InsertCityWeatherAsyncTask(cityWeatherDao).execute(cityWeather)
     }
 
     fun deleteBy(cityName: String) {
-        DeleteCityWeatherAsyncTask(mCityWeatherDao, cityName).execute()
+        DeleteCityWeatherAsyncTask(cityWeatherDao, cityName).execute()
     }
 
     fun getCityHistoryWeatherBy(cityName: String, listen: OnCityHistoryWeatherAsyncListener) {
-        GetAllCityHistoryWeatherAsyncTask(mCityHistoryWeatherDao, listen, cityName).execute()
+        GetAllCityHistoryWeatherAsyncTask(cityHistoryWeatherDao, listen, cityName).execute()
     }
 
     fun insertHistory(cityHistoryWeather: List<CityHistoryWeather>, listen: OnLoadListHistoryWeather) {
-        InsertCityHistoryWeatherAsyncTask(mCityHistoryWeatherDao, listen).execute(cityHistoryWeather)
+        InsertCityHistoryWeatherAsyncTask(cityHistoryWeatherDao, listen).execute(cityHistoryWeather)
     }
 
     fun deleteHistoryBy(cityName: String) {
-        DeleteCityHistoryWeatherAsyncTask(mCityHistoryWeatherDao, cityName).execute()
+        DeleteCityHistoryWeatherAsyncTask(cityHistoryWeatherDao, cityName).execute()
     }
 }

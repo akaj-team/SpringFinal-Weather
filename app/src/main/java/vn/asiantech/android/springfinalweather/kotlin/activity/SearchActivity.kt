@@ -27,12 +27,12 @@ import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnSelectCityLi
 
 class SearchActivity : AppCompatActivity(),
         View.OnClickListener, TextWatcher, Callback<List<City>>, OnSelectCityListener {
-    private lateinit var mCityPredictionAdapter: CityPredictionAdapter
-    private lateinit var mCityApi: CityApi
-    private var mListCity: MutableList<City> = mutableListOf()
-    private var mGranted = false
-    private var mCanBack = true
-    private var mCityMyLocation = City()
+    private lateinit var cityPredictionAdapter: CityPredictionAdapter
+    private lateinit var cityApi: CityApi
+    private var listCity: MutableList<City> = mutableListOf()
+    private var granted = false
+    private var canBack = true
+    private var cityMyLocation = City()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,24 +53,24 @@ class SearchActivity : AppCompatActivity(),
     }
 
     private fun initData() {
-        mCanBack = intent.getBooleanExtra(Constants.CANBACK, true)
-        if (!mCanBack) {
+        canBack = intent.getBooleanExtra(Constants.CAN_BACK, true)
+        if (!canBack) {
             imgIconBack.visibility = View.INVISIBLE
         }
         val sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE)
-        mGranted = sharedPreferences.getBoolean(Constants.LOCATION_PERMISSION, false)
-        mCityMyLocation.name = getString(R.string.get_my_location)
-        if (!mGranted) {
-            mListCity.add(mCityMyLocation)
+        granted = sharedPreferences.getBoolean(Constants.LOCATION_PERMISSION, false)
+        cityMyLocation.name = getString(R.string.get_my_location)
+        if (!granted) {
+            listCity.add(cityMyLocation)
         }
-        mCityPredictionAdapter = CityPredictionAdapter(mListCity, this, this)
-        recyclerViewResultLocation.adapter = mCityPredictionAdapter
+        cityPredictionAdapter = CityPredictionAdapter(listCity, this, this)
+        recyclerViewResultLocation.adapter = cityPredictionAdapter
         recyclerViewResultLocation.layoutManager = LinearLayoutManager(this)
-        mCityApi = ApiCityService().getCityApi()
+        cityApi = ApiCityService().getCityApi()
     }
 
     override fun onClick(v: View?) {
-        if (mCanBack) {
+        if (canBack) {
             onBackPressed()
         }
     }
@@ -79,7 +79,7 @@ class SearchActivity : AppCompatActivity(),
     }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        val callCity: Call<List<City>> = mCityApi.getListCity(s.toString())
+        val callCity: Call<List<City>> = cityApi.getListCity(s.toString())
         callCity.enqueue(this)
     }
 
@@ -88,12 +88,12 @@ class SearchActivity : AppCompatActivity(),
 
     override fun onResponse(call: Call<List<City>>?, response: Response<List<City>>) {
         if (response.isSuccessful) {
-            mListCity.clear()
-            if (!mGranted) {
-                mListCity.add(mCityMyLocation)
+            listCity.clear()
+            if (!granted) {
+                listCity.add(cityMyLocation)
             }
-            response.body()?.forEach { mListCity.add(it) }
-            mCityPredictionAdapter.notifyDataSetChanged()
+            response.body()?.forEach { listCity.add(it) }
+            cityPredictionAdapter.notifyDataSetChanged()
         } else {
             Toast.makeText(this, getString(R.string.response_fail), Toast.LENGTH_SHORT).show()
         }
@@ -117,7 +117,7 @@ class SearchActivity : AppCompatActivity(),
                 editor.putBoolean(Constants.LOCATION_PERMISSION, true)
                 editor.apply()
                 val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra(Constants.FINDLOCATION, true)
+                intent.putExtra(Constants.FIND_LOCATION, true)
                 startActivity(intent)
             } else {
                 Toast.makeText(this, R.string.connect_fail, Toast.LENGTH_SHORT).show()

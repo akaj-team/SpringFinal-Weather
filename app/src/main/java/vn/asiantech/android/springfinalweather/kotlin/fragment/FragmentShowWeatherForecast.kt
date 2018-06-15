@@ -40,32 +40,32 @@ import java.text.DecimalFormat
 
 class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener,
         OnCityHistoryWeatherAsyncListener, OnLoadListHistoryWeather {
-    private lateinit var mRecyclerViewAdapter: RecyclerViewAdapter
-    private lateinit var mDialogLoading: Dialog
-    private lateinit var mCityName: String
-    private lateinit var mDate: String
-    private lateinit var mSecondDate: String
-    private lateinit var mView: View
-    private var mSharedPreferences: SharedPreferences? = null
-    private var mListCityWeather: MutableList<CityWeather> = mutableListOf()
-    private var mListCityHistoryWeather: MutableList<CityHistoryWeather> = mutableListOf()
-    private var mIsNewData = false
-    private var mCount = 0
-    private var mIsCollapse = false
+    private lateinit var recyclerViewAdapter: RecyclerViewAdapter
+    private lateinit var dialogLoading: Dialog
+    private lateinit var cityName: String
+    private lateinit var date: String
+    private lateinit var secondDate: String
+    private lateinit var mainView: View
+    private var sharedPreferences: SharedPreferences? = null
+    private var listCityWeather: MutableList<CityWeather> = mutableListOf()
+    private var listCityHistoryWeather: MutableList<CityHistoryWeather> = mutableListOf()
+    private var isNewData = false
+    private var count = 0
+    private var isCollapse = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mView = inflater.inflate(R.layout.fragment_weather_expand, container, false)
+        mainView = inflater.inflate(R.layout.fragment_weather_expand, container, false)
         initViews()
         initListener()
         initData()
-        return mView
+        return mainView
     }
 
     private fun initViews() {
-        mDialogLoading = Dialog(activity, R.style.Dialog)
-        mDialogLoading.setContentView(R.layout.dialog_waiting)
-        mDialogLoading.setCanceledOnTouchOutside(false)
-        mDialogLoading.setCancelable(true)
+        dialogLoading = Dialog(activity, R.style.Dialog)
+        dialogLoading.setContentView(R.layout.dialog_waiting)
+        dialogLoading.setCanceledOnTouchOutside(false)
+        dialogLoading.setCancelable(true)
     }
 
     private fun initListener() {
@@ -76,11 +76,11 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener,
         transition.addTransition(ChangeImageTransform())
         transition.interpolator = AccelerateDecelerateInterpolator()
         collapse.clone(activity, R.layout.fragment_weather_collapse)
-        expanded.clone(mView.clContent)
+        expanded.clone(mainView.clContent)
         val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
                 if (e2.y > e1.y) {
-                    if (mIsCollapse) {
+                    if (isCollapse) {
                         TransitionManager.beginDelayedTransition(clContent, transition)
                         changeTextSize(tvTemp, 35f, 45f)
                         changeTextSize(tvWind, 12f, 15f)
@@ -88,10 +88,10 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener,
                         changeTextSize(tvHumidity, 12f, 15f)
                         changeTextSize(tvStatus, 16f, 25f)
                         expanded.applyTo(clContent)
-                        mIsCollapse = false
+                        isCollapse = false
                     }
                 } else {
-                    if (!mIsCollapse) {
+                    if (!isCollapse) {
                         TransitionManager.beginDelayedTransition(clContent, transition)
                         changeTextSize(tvTemp, 45f, 35f)
                         changeTextSize(tvWind, 15f, 12f)
@@ -99,13 +99,13 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener,
                         changeTextSize(tvHumidity, 15f, 12f)
                         changeTextSize(tvStatus, 25f, 16f)
                         collapse.applyTo(clContent)
-                        mIsCollapse = true
+                        isCollapse = true
                     }
                 }
                 return true
             }
         })
-        mView.clContent.setOnTouchListener { _, event ->
+        mainView.clContent.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
         }
     }
@@ -119,57 +119,57 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener,
         val bundle = arguments
         if (bundle != null) {
             val cityCollection: CityCollection = bundle.getParcelable(Constants.CITY_COLLECTION)
-            mSharedPreferences = activity?.getSharedPreferences(
+            sharedPreferences = activity?.getSharedPreferences(
                     getString(R.string.shared_preference_name),
                     Context.MODE_PRIVATE)
-            if (mSharedPreferences?.getInt(Constants.UNIT_OF_WIND_SPEED, 0) == 0) {
-                mView.tvWind.text = cityCollection.wind.toInt().toString() + " km/h"
+            if (sharedPreferences?.getInt(Constants.UNIT_OF_WIND_SPEED, 0) == 0) {
+                mainView.tvWind.text = cityCollection.wind.toInt().toString() + " km/h"
             } else {
-                mView.tvWind.text = getMetrePerSecond(cityCollection.wind).toString() + " m/s"
+                mainView.tvWind.text = getMetrePerSecond(cityCollection.wind).toString() + " m/s"
             }
-            val unitOfTemp = mSharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0)
+            val unitOfTemp = sharedPreferences?.getInt(Constants.UNIT_OF_TEMP, 0)
             if (unitOfTemp == 0) {
-                mView.tvTemp.text = cityCollection.temp.toInt().toString() + "°C"
+                mainView.tvTemp.text = cityCollection.temp.toInt().toString() + "°C"
             } else {
-                mView.tvTemp.text = getFahrenheitDegree(cityCollection.temp).toString() + "°F"
+                mainView.tvTemp.text = getFahrenheitDegree(cityCollection.temp).toString() + "°F"
             }
-            mView.imgIcon.setImageResource(Image.getImage(
+            mainView.imgIcon.setImageResource(Image.getImage(
                     cityCollection.icon,
                     cityCollection.day
             ))
-            mView.tvStatus.text = cityCollection.description
-            mView.tvHumidity.text = cityCollection.humidity.toString() + "%"
-            mView.tvCloud.text = cityCollection.cloud.toString() + "%"
-            mCityName = cityCollection.cityName
-            mDate = cityCollection.date
-            mSecondDate = mDate.split(" ")[0]
-            mDialogLoading.show()
+            mainView.tvStatus.text = cityCollection.description
+            mainView.tvHumidity.text = cityCollection.humidity.toString() + "%"
+            mainView.tvCloud.text = cityCollection.cloud.toString() + "%"
+            cityName = cityCollection.cityName
+            date = cityCollection.date
+            secondDate = date.split(" ")[0]
+            dialogLoading.show()
             val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
-            if (isOnline() && !mIsNewData) {
-                mIsNewData = true
-                loadListWeatherFourDay(mCityName)
-                loadLineChartTemp(mCityName)
+            if (isOnline() && !isNewData) {
+                isNewData = true
+                loadListWeatherFourDay(cityName)
+                loadLineChartTemp(cityName)
             } else {
-                weatherRepository?.getCityWeatherBy(mCityName, this)
-                weatherRepository?.getCityHistoryWeatherBy(mCityName, this)
+                weatherRepository?.getCityWeatherBy(cityName, this)
+                weatherRepository?.getCityHistoryWeatherBy(cityName, this)
             }
-            mRecyclerViewAdapter = RecyclerViewAdapter(mListCityWeather, unitOfTemp)
-            mView.recyclerView.adapter = mRecyclerViewAdapter
-            mView.recyclerView.layoutManager = LinearLayoutDisableScroll(context)
+            recyclerViewAdapter = RecyclerViewAdapter(listCityWeather, unitOfTemp)
+            mainView.recyclerView.adapter = recyclerViewAdapter
+            mainView.recyclerView.layoutManager = LinearLayoutDisableScroll(context)
         }
     }
 
     private fun reloadRecyclerView() {
-        mRecyclerViewAdapter.notifyDataSetChanged()
+        recyclerViewAdapter.notifyDataSetChanged()
     }
 
     override fun onLoadCityWeatherList(listCityWeather: List<CityWeather>) {
-        mListCityWeather.clear()
+        this.listCityWeather.clear()
         listCityWeather.forEach {
-            mListCityWeather.add(it)
+            this.listCityWeather.add(it)
         }
         reloadRecyclerView()
-        mCount++
+        count++
         countDialog()
     }
 
@@ -187,7 +187,7 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener,
             dataSet.addPoint(Point(time, tempC))
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            activity?.resources?.getColor(R.color.colorWhite, context?.theme)?.let { mView.lineChartView.setLabelsColor(it) }
+            activity?.resources?.getColor(R.color.colorWhite, context?.theme)?.let { mainView.lineChartView.setLabelsColor(it) }
         }
         dataSet.color = Color.WHITE
         dataSet.isSmooth = true
@@ -195,12 +195,12 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener,
         dataSet.setDotsRadius(5f)
         dataSet.setGradientFill(intArrayOf(Color.parseColor("#b1adad"), R.color.colorGray), null)
         if (dataSet.size() != 0) {
-            mView.lineChartView.setXAxis(false)
-            mView.lineChartView.setLabelsFormat(decimalFormat)
-            mView.lineChartView.addData(dataSet)
-            mView.lineChartView.show()
+            mainView.lineChartView.setXAxis(false)
+            mainView.lineChartView.setLabelsFormat(decimalFormat)
+            mainView.lineChartView.addData(dataSet)
+            mainView.lineChartView.show()
         }
-        mCount++
+        count++
         countDialog()
     }
 
@@ -214,14 +214,14 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener,
             }
 
             override fun onFailure(call: Call<InformationWeatherRecyclerView>?, t: Throwable?) {
-                mDialogLoading.dismiss()
+                dialogLoading.dismiss()
             }
         })
     }
 
     private fun loadLineChartTemp(cityName: String) {
         val apiServicesHistoryInformationWeather = ApiCityService()
-        apiServicesHistoryInformationWeather.getCityApi().getHistoryWeather(cityName, mSecondDate).enqueue(object : Callback<HistoryInformationWeather> {
+        apiServicesHistoryInformationWeather.getCityApi().getHistoryWeather(cityName, secondDate).enqueue(object : Callback<HistoryInformationWeather> {
             override fun onResponse(call: Call<HistoryInformationWeather>?, response: Response<HistoryInformationWeather>) {
                 if (response.isSuccessful) {
                     response.body()?.let {
@@ -231,18 +231,18 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener,
             }
 
             override fun onFailure(call: Call<HistoryInformationWeather>?, t: Throwable?) {
-                mDialogLoading.dismiss()
+                dialogLoading.dismiss()
             }
         })
     }
 
     private fun saveNewCityWeather(informationWeatherRecyclerView: InformationWeatherRecyclerView) {
         val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
-        weatherRepository?.deleteBy(mCityName)
+        weatherRepository?.deleteBy(cityName)
         informationWeatherRecyclerView.forecast.forecastDay.forEach {
             if (informationWeatherRecyclerView.forecast.forecastDay.indexOf(it) != 0) {
                 val cityWeather = CityWeather()
-                cityWeather.cityName = mCityName
+                cityWeather.cityName = cityName
                 cityWeather.date = it.date
                 cityWeather.description = it.day.condition.description
                 cityWeather.tempMax = it.day.maxTemp
@@ -251,27 +251,27 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener,
                 weatherRepository?.insert(cityWeather)
             }
         }
-        weatherRepository?.getCityWeatherBy(mCityName, this)
+        weatherRepository?.getCityWeatherBy(cityName, this)
     }
 
     private fun saveNewCityHistoryWeather(historyInformationWeather: HistoryInformationWeather) {
         val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
-        weatherRepository?.deleteHistoryBy(mCityName)
-        mListCityHistoryWeather.clear()
+        weatherRepository?.deleteHistoryBy(cityName)
+        listCityHistoryWeather.clear()
         historyInformationWeather.forecast.forecastDay[0].hour.forEach {
             val cityHistoryWeather = CityHistoryWeather()
-            cityHistoryWeather.cityName = mCityName
-            cityHistoryWeather.date = mSecondDate
+            cityHistoryWeather.cityName = cityName
+            cityHistoryWeather.date = secondDate
             cityHistoryWeather.tempC = it.tempC
             cityHistoryWeather.time = it.time
-            mListCityHistoryWeather.add(cityHistoryWeather)
+            listCityHistoryWeather.add(cityHistoryWeather)
         }
-        weatherRepository?.insertHistory(mListCityHistoryWeather, this)
+        weatherRepository?.insertHistory(listCityHistoryWeather, this)
     }
 
     override fun onLoadListHistoryWeather() {
         val weatherRepository = activity?.applicationContext?.let { WeatherRepository(it) }
-        weatherRepository?.getCityHistoryWeatherBy(mCityName, this)
+        weatherRepository?.getCityHistoryWeatherBy(cityName, this)
     }
 
     private fun getMetrePerSecond(speed: Float): Int {
@@ -291,14 +291,14 @@ class FragmentShowWeatherForecast : Fragment(), OnCityWeatherAsyncListener,
     }
 
     private fun countDialog() {
-        if (mCount == 2) {
-            mDialogLoading.dismiss()
-            mCount = 0
+        if (count == 2) {
+            dialogLoading.dismiss()
+            count = 0
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mDialogLoading.dismiss()
+        dialogLoading.dismiss()
     }
 }

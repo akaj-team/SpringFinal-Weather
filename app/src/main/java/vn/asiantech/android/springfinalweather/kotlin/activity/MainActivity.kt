@@ -41,15 +41,15 @@ import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 class MainActivity : AppCompatActivity(),
         View.OnClickListener, OnCityCollectionAsyncListener, OnCityCollectionChangeListener,
         DrawerLayout.DrawerListener, Callback<InformationWeather>, OnInsertDoneListener {
-    private lateinit var mViewPagerAdapter: ViewPagerAdapter
-    private lateinit var mCityName: String
-    private lateinit var mCityCollectionAdapter: CityCollectionAdapter
-    private var mListCityCollection: MutableList<CityCollection> = mutableListOf()
-    private var mFocusName: String = ""
-    private var mIsNewData = false
-    private var mIsAddNewCity = false
-    private var mLocation = ""
-    private lateinit var mDialogLoading: Dialog
+    private lateinit var viewPagerAdapter: ViewPagerAdapter
+    private lateinit var cityName: String
+    private lateinit var cityCollectionAdapter: CityCollectionAdapter
+    private var listCityCollection: MutableList<CityCollection> = mutableListOf()
+    private var focusName: String = ""
+    private var isNewData = false
+    private var isAddNewCity = false
+    private var location = ""
+    private lateinit var dialogLoading: Dialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity(),
         initListener()
         initData()
         when {
-            intent.getBooleanExtra(Constants.FINDLOCATION, false) -> {
+            intent.getBooleanExtra(Constants.FIND_LOCATION, false) -> {
                 if (isOnline()) {
                     checkLocationPermission()
                 } else {
@@ -68,8 +68,8 @@ class MainActivity : AppCompatActivity(),
             }
             isHaveDataFromSearch() -> {
                 if (isOnline()) {
-                    mIsAddNewCity = true
-                    loadInformationWeather(mCityName)
+                    isAddNewCity = true
+                    loadInformationWeather(cityName)
                 } else {
                     Toast.makeText(this, R.string.connect_fail, Toast.LENGTH_SHORT).show()
                     initDataFromDatabase()
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity(),
 
     @SuppressLint("MissingPermission")
     private fun checkLocationPermission() {
-        mDialogLoading.show()
+        dialogLoading.show()
         val granted = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         setGranted(granted)
         if (granted) {
@@ -103,19 +103,19 @@ class MainActivity : AppCompatActivity(),
                             override fun onResponse(call: Call<InformationWeather>, response: Response<InformationWeather>) {
                                 if (response.isSuccessful) {
                                     response.body()?.let {
-                                        mIsAddNewCity = true
+                                        isAddNewCity = true
                                         saveNewCityCollection(it, Constants.USER_LOCATION)
                                     }
                                 } else {
-                                    Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
-                                    mDialogLoading.dismiss()
+                                    Toast.makeText(this@MainActivity, R.string.city_not_found, Toast.LENGTH_SHORT).show()
+                                    dialogLoading.dismiss()
                                 }
                             }
 
                             override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
-                                Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@MainActivity, R.string.notification, Toast.LENGTH_SHORT).show()
                                 setGranted(false)
-                                mDialogLoading.dismiss()
+                                dialogLoading.dismiss()
                             }
                         })
             } else {
@@ -137,38 +137,38 @@ class MainActivity : AppCompatActivity(),
         toolBar.setPadding(0, Dimen.getStatusBarHeight(this), 0, 0)
         tvTitleDrawer.setPadding(50, Dimen.getStatusBarHeight(this), 0, Dimen.getStatusBarHeight(this) / 2)
         rlDrawer.setPadding(0, 0, 0, Dimen.getNavigationBarHeight(this))
-        mDialogLoading = Dialog(this, R.style.Dialog)
-        mDialogLoading.setContentView(R.layout.dialog_waiting)
-        mDialogLoading.setCanceledOnTouchOutside(false)
-        mDialogLoading.setCancelable(false)
+        dialogLoading = Dialog(this, R.style.Dialog)
+        dialogLoading.setContentView(R.layout.dialog_waiting)
+        dialogLoading.setCanceledOnTouchOutside(false)
+        dialogLoading.setCancelable(false)
     }
 
     private fun reloadViewPager() {
-        mViewPagerAdapter.notifyDataSetChanged()
-        viewPager.offscreenPageLimit = mListCityCollection.size
+        viewPagerAdapter.notifyDataSetChanged()
+        viewPager.offscreenPageLimit = listCityCollection.size
     }
 
     private fun reloadListCityCollection() {
-        mCityCollectionAdapter.setFocusItem(mFocusName)
-        mCityCollectionAdapter.notifyDataSetChanged()
+        cityCollectionAdapter.setFocusItem(focusName)
+        cityCollectionAdapter.notifyDataSetChanged()
     }
 
     private fun initData() {
         val sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE)
-        mCityCollectionAdapter = CityCollectionAdapter(
-                mListCityCollection,
+        cityCollectionAdapter = CityCollectionAdapter(
+                listCityCollection,
                 this,
                 sharedPreferences.getInt(Constants.UNIT_OF_TEMP, 0)
         )
-        recyclerViewLocation.adapter = mCityCollectionAdapter
+        recyclerViewLocation.adapter = cityCollectionAdapter
         recyclerViewLocation.layoutManager = LinearLayoutManager(this)
-        mViewPagerAdapter = ViewPagerAdapter(supportFragmentManager, mListCityCollection)
-        viewPager.adapter = mViewPagerAdapter
+        viewPagerAdapter = ViewPagerAdapter(supportFragmentManager, listCityCollection)
+        viewPager.adapter = viewPagerAdapter
     }
 
     private fun initDataFromDatabase() {
         val sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE)
-        mLocation = sharedPreferences.getString(Constants.NAME_LOCATION, "")
+        location = sharedPreferences.getString(Constants.NAME_LOCATION, "")
         val weatherRepository = WeatherRepository(this)
         weatherRepository.getAllCityCollection(this)
     }
@@ -187,12 +187,12 @@ class MainActivity : AppCompatActivity(),
 
             @SuppressLint("SetTextI18n")
             override fun onPageSelected(position: Int) {
-                mFocusName = mListCityCollection[position].cityName
-                tvTitle.text = "$mFocusName, ${mListCityCollection[position].countryName}"
-                tvDate.text = Dimen.getDate(mListCityCollection[position].date)
+                focusName = listCityCollection[position].cityName
+                tvTitle.text = "$focusName, ${listCityCollection[position].countryName}"
+                tvDate.text = Dimen.getDate(listCityCollection[position].date)
                 drawerLayout.setBackgroundResource(Image.getBackground(
-                        mListCityCollection[position].icon,
-                        mListCityCollection[position].day
+                        listCityCollection[position].icon,
+                        listCityCollection[position].day
                 ))
             }
         })
@@ -206,11 +206,11 @@ class MainActivity : AppCompatActivity(),
             R.id.tvAddLocation -> goTo(SearchActivity::class.java)
             R.id.imgRefresh -> {
                 if (isOnline()) {
-                    mFocusName = mListCityCollection[viewPager.currentItem].cityName
+                    focusName = listCityCollection[viewPager.currentItem].cityName
                     val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
-                    editor.putString(Constants.FOCUS_POSITION, mFocusName)
+                    editor.putString(Constants.FOCUS_POSITION, focusName)
                     editor.apply()
-                    loadInformationWeather(mFocusName)
+                    loadInformationWeather(focusName)
                 } else {
                     Toast.makeText(this, R.string.connect_fail, Toast.LENGTH_SHORT).show()
                 }
@@ -220,15 +220,15 @@ class MainActivity : AppCompatActivity(),
 
     private fun goTo(markClass: Class<*>, canBack: Boolean = true) {
         intent = Intent(this, markClass)
-        intent.putExtra(Constants.CANBACK, canBack)
+        intent.putExtra(Constants.CAN_BACK, canBack)
         startActivity(intent)
     }
 
     private fun isHaveDataFromSearch(): Boolean {
         val bundle = intent.extras
         if (bundle != null) {
-            mCityName = bundle.getString(Constants.CITY_NAME, "")
-            if (mCityName.isNotEmpty()) {
+            cityName = bundle.getString(Constants.CITY_NAME, "")
+            if (cityName.isNotEmpty()) {
                 return true
             }
         }
@@ -238,28 +238,28 @@ class MainActivity : AppCompatActivity(),
     @SuppressLint("SetTextI18n")
     override fun onLoadListListener(listCityCollection: List<CityCollection>) {
         val sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE)
-        mListCityCollection.clear()
+        this.listCityCollection.clear()
         var hasFocusName = false
         var index = 0
         if (listCityCollection.isNotEmpty()) {
-            mFocusName = sharedPreferences.getString(Constants.FOCUS_POSITION, listCityCollection[0].cityName)
+            focusName = sharedPreferences.getString(Constants.FOCUS_POSITION, listCityCollection[0].cityName)
             listCityCollection.forEach {
-                mListCityCollection.add(it)
-                if (mFocusName == it.cityName) {
+                this.listCityCollection.add(it)
+                if (focusName == it.cityName) {
                     hasFocusName = true
                     index = listCityCollection.indexOf(it)
                 }
             }
             if (!hasFocusName) {
-                mFocusName = listCityCollection[0].cityName
+                focusName = listCityCollection[0].cityName
             }
             reloadViewPager()
             viewPager.currentItem = index
-            tvTitle.text = "$mFocusName, ${mListCityCollection[index].countryName}"
-            tvDate.text = Dimen.getDate(mListCityCollection[index].date)
+            tvTitle.text = "$focusName, ${this.listCityCollection[index].countryName}"
+            tvDate.text = Dimen.getDate(this.listCityCollection[index].date)
             drawerLayout.setBackgroundResource(Image.getBackground(
-                    mListCityCollection[index].icon,
-                    mListCityCollection[index].day
+                    this.listCityCollection[index].icon,
+                    this.listCityCollection[index].day
             ))
         } else {
             ActivityCompat.requestPermissions(
@@ -268,14 +268,14 @@ class MainActivity : AppCompatActivity(),
                     Constants.LOCATION_PERMISSION_REQUEST
             )
         }
-        if (isOnline() && !mIsNewData && mListCityCollection.isNotEmpty()) {
-            mIsNewData = true
-            mListCityCollection.forEach {
+        if (isOnline() && !isNewData && this.listCityCollection.isNotEmpty()) {
+            isNewData = true
+            this.listCityCollection.forEach {
                 loadInformationWeather(it.cityName)
             }
         }
         reloadListCityCollection()
-        mDialogLoading.dismiss()
+        dialogLoading.dismiss()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -302,19 +302,19 @@ class MainActivity : AppCompatActivity(),
 
     private fun addNewCityCollection(cityCollection: CityCollection) {
         var index: Int? = null
-        for (city in mListCityCollection) {
+        for (city in listCityCollection) {
             if (city.cityName == cityCollection.cityName) {
-                index = mListCityCollection.indexOf(city)
-                mFocusName = cityCollection.cityName
+                index = listCityCollection.indexOf(city)
+                focusName = cityCollection.cityName
                 break
             }
         }
         if (index == null) {
-            mListCityCollection.add(cityCollection)
-            mFocusName = cityCollection.cityName
+            listCityCollection.add(cityCollection)
+            focusName = cityCollection.cityName
         }
         val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
-        editor.putString(Constants.FOCUS_POSITION, mFocusName)
+        editor.putString(Constants.FOCUS_POSITION, focusName)
         editor.apply()
     }
 
@@ -322,29 +322,29 @@ class MainActivity : AppCompatActivity(),
     override fun onDeleteCityCollection(cityCollection: CityCollection) {
         val weatherRepository = WeatherRepository(this)
         weatherRepository.delete(cityCollection)
-        if (mListCityCollection.size > 1) {
-            if (cityCollection.cityName == mFocusName) {
-                mListCityCollection.remove(cityCollection)
+        if (listCityCollection.size > 1) {
+            if (cityCollection.cityName == focusName) {
+                listCityCollection.remove(cityCollection)
                 reloadViewPager()
                 viewPager.currentItem = 0
-                mFocusName = mListCityCollection[0].cityName
-                tvTitle.text = "$mFocusName, ${mListCityCollection[0].countryName}"
-                tvDate.text = Dimen.getDate(mListCityCollection[0].date)
+                focusName = listCityCollection[0].cityName
+                tvTitle.text = "$focusName, ${listCityCollection[0].countryName}"
+                tvDate.text = Dimen.getDate(listCityCollection[0].date)
                 drawerLayout.setBackgroundResource(Image.getBackground(
-                        mListCityCollection[0].icon,
-                        mListCityCollection[0].day
+                        listCityCollection[0].icon,
+                        listCityCollection[0].day
                 ))
                 reloadListCityCollection()
             } else {
-                if (viewPager.currentItem > mListCityCollection.indexOf(cityCollection)) {
-                    viewPager.currentItem = mListCityCollection.indexOf(cityCollection) + 1
+                if (viewPager.currentItem > listCityCollection.indexOf(cityCollection)) {
+                    viewPager.currentItem = listCityCollection.indexOf(cityCollection) + 1
                 }
-                mListCityCollection.remove(cityCollection)
+                listCityCollection.remove(cityCollection)
                 reloadListCityCollection()
                 reloadViewPager()
             }
         } else {
-            mListCityCollection.clear()
+            listCityCollection.clear()
             reloadListCityCollection()
             reloadViewPager()
             goTo(SearchActivity::class.java, false)
@@ -352,8 +352,8 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onChangeShowCityCollection(cityCollection: CityCollection) {
-        mFocusName = cityCollection.cityName
-        viewPager.currentItem = mListCityCollection.indexOf(cityCollection)
+        focusName = cityCollection.cityName
+        viewPager.currentItem = listCityCollection.indexOf(cityCollection)
     }
 
     override fun onDrawerStateChanged(newState: Int) {
@@ -370,7 +370,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun loadInformationWeather(cityName: String) {
-        mDialogLoading.show()
+        dialogLoading.show()
         val apiServices = ApiCityService()
         apiServices.getCityApi().getCurrentWeather(cityName).enqueue(this)
     }
@@ -382,14 +382,14 @@ class MainActivity : AppCompatActivity(),
             }
         } else {
             Toast.makeText(baseContext, R.string.city_not_found, Toast.LENGTH_SHORT).show()
-            mDialogLoading.dismiss()
+            dialogLoading.dismiss()
         }
     }
 
     override fun onFailure(call: Call<InformationWeather>, t: Throwable) {
         Toast.makeText(baseContext, R.string.notification, Toast.LENGTH_SHORT).show()
         initDataFromDatabase()
-        mDialogLoading.dismiss()
+        dialogLoading.dismiss()
     }
 
     private fun saveNewCityCollection(informationWeather: InformationWeather, state: Boolean = Constants.OTHER_LOCATION) {
@@ -406,7 +406,7 @@ class MainActivity : AppCompatActivity(),
         cityCollection.icon = informationWeather.current.condition.icon
         cityCollection.date = informationWeather.current.date
         cityCollection.day = informationWeather.current.isDay
-        if (mLocation == cityCollection.cityName) {
+        if (location == cityCollection.cityName) {
             cityCollection.state = true
         }
         if (state) {
@@ -419,8 +419,8 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onInsertDone(cityCollection: CityCollection) {
-        if (mIsAddNewCity) {
-            mIsAddNewCity = false
+        if (isAddNewCity) {
+            isAddNewCity = false
             addNewCityCollection(cityCollection)
         }
         initDataFromDatabase()
@@ -435,7 +435,7 @@ class MainActivity : AppCompatActivity(),
     override fun onStop() {
         super.onStop()
         val editor = getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).edit()
-        editor.putString(Constants.FOCUS_POSITION, mFocusName)
+        editor.putString(Constants.FOCUS_POSITION, focusName)
         editor.apply()
     }
 }
