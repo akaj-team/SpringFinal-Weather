@@ -8,11 +8,8 @@ import android.support.v4.view.PagerAdapter
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.fragment.FragmentShowWeatherForecast
 import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnRefreshListener
 
-class ViewPagerAdapter(fm: FragmentManager,
-                       private var mListCityCollection: MutableList<CityCollection>,
-                       private var mListener: OnRefreshListener)
+class ViewPagerAdapter(fm: FragmentManager, private var mListCityCollection: MutableList<CityCollection>)
     : FragmentStatePagerAdapter(fm) {
 
     override fun getItem(position: Int): Fragment? {
@@ -29,7 +26,6 @@ class ViewPagerAdapter(fm: FragmentManager,
 
     private fun newFragment(cityCollection: CityCollection): FragmentShowWeatherForecast {
         val fragmentShowWeatherForecast = FragmentShowWeatherForecast()
-        fragmentShowWeatherForecast.setListener(mListener)
         val bundle = Bundle()
         bundle.putParcelable(Constants.CITY_COLLECTION, cityCollection)
         fragmentShowWeatherForecast.arguments = bundle

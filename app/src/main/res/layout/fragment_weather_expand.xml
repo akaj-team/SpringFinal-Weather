@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/clContent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <ImageView
+        android:id="@+id/imgIcon"
+        android:layout_width="match_parent"
+        android:layout_height="213dp" />
+
+    <TextView
+        android:id="@+id/tvTemp"
+        android:layout_width="135dp"
+        android:layout_height="76dp"
+        android:layout_marginStart="8dp"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="45sp"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@+id/tvTemp"
+        app:layout_constraintTop_toTopOf="@+id/tvTemp" />
+
+    <TextView
+        android:id="@+id/tvHumidity"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:drawableTop="@drawable/ic_humidity"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+        app:layout_constraintEnd_toStartOf="@+id/tvCloud"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toEndOf="@+id/tvTemp"
+        app:layout_constraintTop_toBottomOf="@+id/tvStatus" />
+
+    <TextView
+        android:id="@+id/tvCloud"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:drawableTop="@drawable/ic_cloud"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+        app:layout_constraintEnd_toStartOf="@+id/tvWind"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/tvHumidity"
+        app:layout_constraintTop_toBottomOf="@+id/tvStatus" />
+
+    <TextView
+        android:id="@+id/tvWind"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:drawableTop="@drawable/ic_wind"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/tvCloud"
+        app:layout_constraintTop_toBottomOf="@+id/tvStatus" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgIcon" />
+
+    <com.db.chart.view.LineChartView
+        android:id="@+id/lineChartView"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerView" />
+</android.support.constraint.ConstraintLayout>

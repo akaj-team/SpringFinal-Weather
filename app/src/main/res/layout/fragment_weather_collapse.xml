@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/clContent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <ImageView
+        android:id="@+id/imgIcon"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        app:layout_constraintEnd_toEndOf="@id/tvStatus"
+        app:layout_constraintStart_toEndOf="@id/tvTemp"
+        app:layout_constraintStart_toStartOf="@id/tvStatus"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvTemp"
+        android:layout_width="135dp"
+        android:layout_height="76dp"
+        android:layout_marginStart="8dp"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="35sp"
+        app:layout_constraintBottom_toTopOf="@id/tvCloud"
+        app:layout_constraintEnd_toEndOf="@id/tvWind"
+        app:layout_constraintStart_toStartOf="@id/tvHumidity"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/imgIcon"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tvHumidity"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:drawableTop="@drawable/ic_humidity"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvStatus"
+        app:layout_constraintEnd_toStartOf="@+id/tvCloud"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tvCloud"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:drawableTop="@drawable/ic_cloud"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvStatus"
+        app:layout_constraintEnd_toStartOf="@+id/tvWind"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/tvHumidity" />
+
+    <TextView
+        android:id="@+id/tvWind"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:drawableTop="@drawable/ic_wind"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvStatus"
+        app:layout_constraintEnd_toStartOf="@+id/tvStatus"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/tvCloud" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvStatus" />
+
+    <com.db.chart.view.LineChartView
+        android:id="@+id/lineChartView"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerView" />
+</android.support.constraint.ConstraintLayout>
