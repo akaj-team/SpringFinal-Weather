@@ -9,11 +9,11 @@ import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.fragment.FragmentShowWeatherForecast
 import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
 
-class ViewPagerAdapter(fm: FragmentManager, private var mListCityCollection: MutableList<CityCollection>)
+class ViewPagerAdapter(fm: FragmentManager, private var listCityCollection: MutableList<CityCollection>)
     : FragmentStatePagerAdapter(fm) {
 
     override fun getItem(position: Int): Fragment? {
-        return newFragment(mListCityCollection[position])
+        return newFragment(listCityCollection[position])
     }
 
     override fun getItemPosition(`object`: Any): Int {
@@ -21,7 +21,7 @@ class ViewPagerAdapter(fm: FragmentManager, private var mListCityCollection: Mut
     }
 
     override fun getCount(): Int {
-        return mListCityCollection.size
+        return listCityCollection.size
     }
 
     private fun newFragment(cityCollection: CityCollection): FragmentShowWeatherForecast {

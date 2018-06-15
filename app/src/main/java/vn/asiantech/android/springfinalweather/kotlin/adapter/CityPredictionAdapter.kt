@@ -16,8 +16,8 @@ import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnSelectCityLi
 class CityPredictionAdapter(
         private val listCity: List<City>?,
         private val listener: OnSelectCityListener,
-        private val activity: Activity)
-    : RecyclerView.Adapter<CityPredictionAdapter.CityHolder>() {
+        private val activity: Activity
+) : RecyclerView.Adapter<CityPredictionAdapter.CityHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CityHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_city_prediction, parent, false)
         return CityHolder(view, listener, activity)
@@ -34,24 +34,24 @@ class CityPredictionAdapter(
 
     class CityHolder(itemView: View, listener: OnSelectCityListener, activity: Activity)
         : RecyclerView.ViewHolder(itemView) {
-        private var mTvCityName: TextView = itemView.findViewById(R.id.tvCityName)
+        private var tvCityName: TextView = itemView.findViewById(R.id.tvCityName)
 
         init {
             itemView.setOnClickListener {
-                if (mTvCityName.text.trim() == activity.getString(R.string.get_my_location)) {
+                if (tvCityName.text.trim() == activity.getString(R.string.get_my_location)) {
                     ActivityCompat.requestPermissions(
                             activity,
                             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                             Constants.LOCATION_PERMISSION_REQUEST
                     )
                 } else {
-                    listener.onCitySelected(mTvCityName.text.toString().trim())
+                    listener.onCitySelected(tvCityName.text.toString().trim())
                 }
             }
         }
 
         fun bind(city: City?) {
-            mTvCityName.text = city?.name
+            tvCityName.text = city?.name
         }
     }
 }

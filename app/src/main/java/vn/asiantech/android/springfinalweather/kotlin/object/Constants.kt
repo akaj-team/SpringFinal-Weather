@@ -11,8 +11,8 @@ class Constants {
         //const for intent key
         const val CITY_NAME = "city_name"
         const val CITY_COLLECTION = "city_colection"
-        const val CANBACK = "can_back"
-        const val FINDLOCATION = "find_location"
+        const val CAN_BACK = "can_back"
+        const val FIND_LOCATION = "find_location"
 
         //const for Api
         const val KEY = "f0603e22bb3c474199934408180506"

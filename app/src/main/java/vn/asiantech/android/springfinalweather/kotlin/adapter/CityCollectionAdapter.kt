@@ -13,26 +13,26 @@ import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
 import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionChangeListener
 
 class CityCollectionAdapter(
-        private var mListCity: MutableList<CityCollection>,
-        private var mListener: OnCityCollectionChangeListener,
-        private var mUnitOfTemp: Int
+        private var listCity: MutableList<CityCollection>,
+        private var listener: OnCityCollectionChangeListener,
+        private var unitOfTemp: Int
 ) : RecyclerView.Adapter<CityCollectionAdapter.CityCollectionHolder>() {
-    private var mFocusItem: String = ""
+    private var focusItem: String = ""
     fun setFocusItem(focusItem: String) {
-        mFocusItem = focusItem
+        this.focusItem = focusItem
     }
 
     override fun getItemCount(): Int {
-        return mListCity.size
+        return listCity.size
     }
 
     override fun onBindViewHolder(holder: CityCollectionHolder, position: Int) {
-        holder.bind(mListCity[position], mFocusItem, mUnitOfTemp)
+        holder.bind(listCity[position], focusItem, unitOfTemp)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CityCollectionHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_city_collection, parent, false)
-        return CityCollectionHolder(view, mListener)
+        return CityCollectionHolder(view, listener)
     }
 
     class CityCollectionHolder(itemView: View, private var listener: OnCityCollectionChangeListener)
