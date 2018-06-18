@@ -3,7 +3,7 @@ package vn.asiantech.android.springfinalweather.kotlin.asynctask
 import android.os.AsyncTask
 import vn.asiantech.android.springfinalweather.kotlin.dao.CityCollectionDao
 import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnInsertDoneListener
+import vn.asiantech.android.springfinalweather.kotlin.interfaces.OnInsertDoneListener
 
 class InsertCityCollectionAsyncTask(
         private var cityCollectionDao: CityCollectionDao,

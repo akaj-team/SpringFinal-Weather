@@ -10,7 +10,7 @@ import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Image
 import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionChangeListener
+import vn.asiantech.android.springfinalweather.kotlin.interfaces.OnCityCollectionChangeListener
 
 class CityCollectionAdapter(
         private var listCity: MutableList<CityCollection>,

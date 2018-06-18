@@ -8,7 +8,7 @@ import vn.asiantech.android.springfinalweather.kotlin.dao.CityWeatherDao
 import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
 import vn.asiantech.android.springfinalweather.kotlin.model.CityHistoryWeather
 import vn.asiantech.android.springfinalweather.kotlin.model.CityWeather
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.*
+import vn.asiantech.android.springfinalweather.kotlin.interfaces.*
 
 class WeatherRepository(context: Context) {
     private lateinit var cityWeatherDao: CityWeatherDao

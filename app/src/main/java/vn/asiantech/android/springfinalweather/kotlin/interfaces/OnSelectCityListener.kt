@@ -1,4 +1,4 @@
-package vn.asiantech.android.springfinalweather.kotlin.myinterface
+package vn.asiantech.android.springfinalweather.kotlin.interfaces
 
 interface OnSelectCityListener {
     fun onCitySelected(cityName: String)

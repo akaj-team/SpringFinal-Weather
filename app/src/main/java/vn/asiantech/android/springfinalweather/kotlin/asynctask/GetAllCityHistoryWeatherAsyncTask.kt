@@ -3,7 +3,7 @@ package vn.asiantech.android.springfinalweather.kotlin.asynctask
 import android.os.AsyncTask
 import vn.asiantech.android.springfinalweather.kotlin.dao.CityHistoryWeatherDao
 import vn.asiantech.android.springfinalweather.kotlin.model.CityHistoryWeather
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityHistoryWeatherAsyncListener
+import vn.asiantech.android.springfinalweather.kotlin.interfaces.OnCityHistoryWeatherAsyncListener
 
 class GetAllCityHistoryWeatherAsyncTask(
         private var cityHistoryWeatherDao: CityHistoryWeatherDao,

@@ -20,10 +20,10 @@ import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Dimen
 import vn.asiantech.android.springfinalweather.kotlin.adapter.CityPredictionAdapter
-import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiCityService
+import vn.asiantech.android.springfinalweather.kotlin.service.ApiCityService
 import vn.asiantech.android.springfinalweather.kotlin.model.City
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.CityApi
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnSelectCityListener
+import vn.asiantech.android.springfinalweather.kotlin.interfaces.CityApi
+import vn.asiantech.android.springfinalweather.kotlin.interfaces.OnSelectCityListener
 
 class SearchActivity : AppCompatActivity(),
         View.OnClickListener, TextWatcher, Callback<List<City>>, OnSelectCityListener {
