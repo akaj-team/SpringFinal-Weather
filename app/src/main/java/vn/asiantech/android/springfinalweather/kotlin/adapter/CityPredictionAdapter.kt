@@ -11,7 +11,7 @@ import android.widget.TextView
 import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.model.City
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnSelectCityListener
+import vn.asiantech.android.springfinalweather.kotlin.interfaces.OnSelectCityListener
 
 class CityPredictionAdapter(
         private val listCity: List<City>?,

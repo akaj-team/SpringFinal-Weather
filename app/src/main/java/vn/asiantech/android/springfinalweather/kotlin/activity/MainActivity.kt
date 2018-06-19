@@ -29,12 +29,12 @@ import vn.asiantech.android.springfinalweather.kotlin.`object`.Dimen
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Image
 import vn.asiantech.android.springfinalweather.kotlin.adapter.CityCollectionAdapter
 import vn.asiantech.android.springfinalweather.kotlin.adapter.ViewPagerAdapter
-import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiCityService
+import vn.asiantech.android.springfinalweather.kotlin.service.ApiCityService
 import vn.asiantech.android.springfinalweather.kotlin.model.CityCollection
 import vn.asiantech.android.springfinalweather.kotlin.model.InformationWeather
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionAsyncListener
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityCollectionChangeListener
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnInsertDoneListener
+import vn.asiantech.android.springfinalweather.kotlin.interfaces.OnCityCollectionAsyncListener
+import vn.asiantech.android.springfinalweather.kotlin.interfaces.OnCityCollectionChangeListener
+import vn.asiantech.android.springfinalweather.kotlin.interfaces.OnInsertDoneListener
 import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 
 

@@ -29,12 +29,12 @@ import vn.asiantech.android.springfinalweather.R
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Constants
 import vn.asiantech.android.springfinalweather.kotlin.`object`.Image
 import vn.asiantech.android.springfinalweather.kotlin.adapter.RecyclerViewAdapter
-import vn.asiantech.android.springfinalweather.kotlin.apiservice.ApiCityService
+import vn.asiantech.android.springfinalweather.kotlin.service.ApiCityService
 import vn.asiantech.android.springfinalweather.kotlin.layoutmanager.LinearLayoutDisableScroll
 import vn.asiantech.android.springfinalweather.kotlin.model.*
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityHistoryWeatherAsyncListener
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnCityWeatherAsyncListener
-import vn.asiantech.android.springfinalweather.kotlin.myinterface.OnLoadListHistoryWeather
+import vn.asiantech.android.springfinalweather.kotlin.interfaces.OnCityHistoryWeatherAsyncListener
+import vn.asiantech.android.springfinalweather.kotlin.interfaces.OnCityWeatherAsyncListener
+import vn.asiantech.android.springfinalweather.kotlin.interfaces.OnLoadListHistoryWeather
 import vn.asiantech.android.springfinalweather.kotlin.room.WeatherRepository
 import java.text.DecimalFormat
 

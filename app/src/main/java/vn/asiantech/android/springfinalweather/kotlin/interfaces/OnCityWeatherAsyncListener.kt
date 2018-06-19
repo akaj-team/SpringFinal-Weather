@@ -1,4 +1,4 @@
-package vn.asiantech.android.springfinalweather.kotlin.myinterface
+package vn.asiantech.android.springfinalweather.kotlin.interfaces
 
 import vn.asiantech.android.springfinalweather.kotlin.model.CityWeather
 

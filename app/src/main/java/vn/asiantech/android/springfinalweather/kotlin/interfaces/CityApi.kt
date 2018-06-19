@@ -1,4 +1,4 @@
-package vn.asiantech.android.springfinalweather.kotlin.myinterface
+package vn.asiantech.android.springfinalweather.kotlin.interfaces
 
 import retrofit2.Call
 import retrofit2.http.GET
